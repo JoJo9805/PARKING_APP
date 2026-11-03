@@ -6,6 +6,7 @@ DisplayManager::DisplayManager()
       eventMsgTimestamp(0),
       showingEventMsg(false),
       activeEvent(GATE_EVENT_NONE),
+      lastHandledEvent(GATE_EVENT_NONE),
       cachedAvailA(255),
       cachedAvailB(255),
       lastOledRefreshTime(0) {
@@ -35,7 +36,7 @@ void DisplayManager::update(uint8_t totalAvail, uint8_t availA, uint8_t availB,
     (void)barrierOpen; // Tránh warning unused
 
     // 1. Cập nhật màn hình LCD 1602
-    updateLcd(totalAvail, lastEvent);
+    updateLcd(totalAvail, availA, availB, lastEvent);
 
     // 2. Cập nhật màn hình OLED SH1106 non-blocking
     unsigned long now = millis();
@@ -65,104 +66,130 @@ void DisplayManager::showLcdMessage(const char* line1, const char* line2) {
     }
 }
 
-void DisplayManager::updateLcd(uint8_t totalAvail, GateEvent lastEvent) {
+void DisplayManager::updateLcd(uint8_t totalAvail, uint8_t availA, uint8_t availB, GateEvent lastEvent) {
     char targetLine1[17] = " SMART PARKING  ";
     char targetLine2[17];
 
     unsigned long now = millis();
 
-    // Bắt sự kiện mới từ cổng
-    if (lastEvent != GATE_EVENT_NONE) {
+    // 1. Bắt sự kiện mới từ cổng (Edge-Trigger: chỉ ghi nhận khi sự kiện mới xuất hiện)
+    if (lastEvent != GATE_EVENT_NONE && lastEvent != lastHandledEvent) {
         showingEventMsg = true;
         activeEvent = lastEvent;
         eventMsgTimestamp = now;
+        lastHandledEvent = lastEvent;
     }
 
-    // Kiểm tra hết thời gian hiển thị thông điệp tạm thời
+    // 2. Hết thời gian hiển thị thông điệp tạm thời
     if (showingEventMsg && (now - eventMsgTimestamp >= LCD_MSG_DURATION_MS)) {
-        showingEventMsg = false;
-        activeEvent = GATE_EVENT_NONE;
+        // Riêng trường hợp xe bị chặn vì bãi đầy, giữ thông báo cho tới khi xe lùi đi
+        if (lastEvent != GATE_EVENT_BLOCKED_FULL) {
+            showingEventMsg = false;
+            activeEvent = GATE_EVENT_NONE;
+        }
     }
 
+    // Reset cờ nhận diện sự kiện khi cổng đã rảnh và thông điệp tạm thời đã kết thúc
+    if (!showingEventMsg && lastEvent == GATE_EVENT_NONE) {
+        lastHandledEvent = GATE_EVENT_NONE;
+    }
+
+    // 3. Xử lý DÒNG 1: Tiêu đề mặc định hoặc Thông điệp sự kiện cổng tạm thời
     if (showingEventMsg) {
         switch (activeEvent) {
             case GATE_EVENT_CAR_ENTERING:
-                strncpy(targetLine2, " MOI VAO...     ", sizeof(targetLine2));
+                strncpy(targetLine1, " MOI VAO >>     ", sizeof(targetLine1));
                 break;
             case GATE_EVENT_CAR_EXITING:
-                strncpy(targetLine2, " TAM BIET!      ", sizeof(targetLine2));
+                strncpy(targetLine1, " TAM BIET <<    ", sizeof(targetLine1));
                 break;
             case GATE_EVENT_BLOCKED_FULL:
-                strncpy(targetLine2, " BAI DA DAY!    ", sizeof(targetLine2));
+                strncpy(targetLine1, " BAI DA DAY!    ", sizeof(targetLine1));
                 break;
             case GATE_EVENT_TIMEOUT:
-                strncpy(targetLine2, " DONG BARIE...  ", sizeof(targetLine2));
+                strncpy(targetLine1, " DONG BARIE...  ", sizeof(targetLine1));
                 break;
             default:
-                snprintf(targetLine2, sizeof(targetLine2), " Trong: %d/4 [OK] ", totalAvail);
+                strncpy(targetLine1, " SMART PARKING  ", sizeof(targetLine1));
                 break;
         }
     } else {
-        if (totalAvail == 0) {
-            strncpy(targetLine2, " BAI DA DAY!    ", sizeof(targetLine2));
-        } else {
-            snprintf(targetLine2, sizeof(targetLine2), " Trong: %d/4 [OK] ", totalAvail);
-        }
+        strncpy(targetLine1, " SMART PARKING  ", sizeof(targetLine1));
     }
+    targetLine1[sizeof(targetLine1) - 1] = '\0';
 
+    // 4. Xử lý DÒNG 2: LUÔN LUÔN hiển thị trạng thái vị trí chỗ trống thời gian thực (Real-time)
+    if (totalAvail == 0) {
+        strncpy(targetLine2, "Tr:0/4 (HET CHO)", sizeof(targetLine2));
+    } else {
+        // Định dạng 16 ký tự vừa vặn: "Tr:3/4 (A:1 B:2)"
+        snprintf(targetLine2, sizeof(targetLine2), "Tr:%d/4 (A:%d B:%d)", totalAvail, availA, availB);
+    }
+    targetLine2[sizeof(targetLine2) - 1] = '\0';
+
+    // Cập nhật lên LCD (chống nhấp nháy nhờ bộ đệm so sánh)
     showLcdMessage(targetLine1, targetLine2);
-}
-
-void DisplayManager::drawArrowRight(int startX, int midY) {
-    // Thân ngang mũi tên (dày 5px)
-    oled.drawBox(startX, midY - 2, 18, 5);
-    // Đầu tam giác nhọn hướng sang Phải
-    oled.drawTriangle(startX + 18, midY - 7,
-                      startX + 18, midY + 7,
-                      startX + 28, midY);
-}
-
-void DisplayManager::drawArrowStraightRight(int stemX, int startY, int turnY, int endX) {
-    // Thân dọc đi thẳng lên (dày 5px)
-    oled.drawBox(stemX, turnY, 5, startY - turnY + 1);
-    // Nhánh ngang rẽ sang phải (dày 5px)
-    oled.drawBox(stemX, turnY, endX - stemX, 5);
-    // Đầu tam giác nhọn hướng sang Phải
-    oled.drawTriangle(endX, turnY - 5,
-                      endX, turnY + 9,
-                      endX + 10, turnY + 2);
 }
 
 void DisplayManager::updateOled(uint8_t availA, uint8_t availB) {
     oled.clearBuffer();
 
-    // 1. Đường kẻ khung giao diện (Chia 2 cột đối xứng)
-    oled.drawHLine(0, 14, 128);  // Phân cách tiêu đề
-    oled.drawVLine(63, 0, 64);   // Phân cách cột Khu A và Khu B
-    oled.drawHLine(0, 47, 128);  // Phân cách vùng số slot
+    // 1. Đường kẻ khung phân chia giao diện:
+    // Cột dọc giữa phân cách Khu B (Trái) và Khu A (Phải)
+    oled.drawVLine(63, 0, 64);
+    // Đường ngang phân cách Tiêu đề (y=16) và Tình trạng (y=42)
+    oled.drawHLine(0, 16, 128);
+    oled.drawHLine(0, 42, 128);
 
-    // 2. Tiêu đề cột
-    oled.setFont(u8g2_font_6x12_tr);
-    oled.drawStr(17, 11, "KHU A");
-    oled.drawStr(81, 11, "KHU B");
-
-    // 3. Đồ họa Mũi tên chỉ hướng theo sơ đồ sa hình
-    // Khu A: Mũi tên Rẽ Phải (luôn hiển thị, kể cả khi 0/2)
-    drawArrowRight(18, 30);
-
-    // Khu B: Mũi tên Đi thẳng rồi rẽ Phải (luôn hiển thị, kể cả khi 0/2)
-    drawArrowStraightRight(82, 41, 23, 104);
-
-    // 4. Số lượng slot khả dụng [ X / 2 ]
+    // 2. Tiêu đề: TRÁI LÀ KHU B, PHẢI LÀ KHU A
     oled.setFont(u8g2_font_7x14B_tr);
+    int wB = oled.getStrWidth("KHU B");
+    oled.drawStr((63 - wB) / 2, 13, "KHU B");
+
+    int wA = oled.getStrWidth("KHU A");
+    oled.drawStr(64 + (63 - wA) / 2, 13, "KHU A");
+
+    // 3. Số lượng chỗ trống khả dụng [ X / 2 ] ở giữa
+    char strB[12];
+    snprintf(strB, sizeof(strB), "[ %d/2 ]", availB);
+    int wSlotB = oled.getStrWidth(strB);
+    oled.drawStr((63 - wSlotB) / 2, 34, strB);
 
     char strA[12];
     snprintf(strA, sizeof(strA), "[ %d/2 ]", availA);
-    oled.drawStr(11, 61, strA);
+    int wSlotA = oled.getStrWidth(strA);
+    oled.drawStr(64 + (63 - wSlotA) / 2, 34, strA);
 
-    char strB[12];
-    snprintf(strB, sizeof(strB), "[ %d/2 ]", availB);
-    oled.drawStr(75, 61, strB);
+    // 4. Tình trạng chỗ ở dòng dưới (CÒN CHỖ / HẾT CHỖ)
+    oled.setFont(u8g2_font_6x12_tr);
+
+    // Khu B (Bên trái)
+    const char* statB = (availB > 0) ? "CON CHO" : "HET CHO";
+    int wStatB = oled.getStrWidth(statB);
+    int xStatB = (63 - wStatB) / 2;
+    if (availB == 0) {
+        // Nền đảo màu để cảnh báo hết chỗ nổi bật
+        oled.drawBox(2, 46, 59, 15);
+        oled.setDrawColor(0);
+        oled.drawStr(xStatB, 58, statB);
+        oled.setDrawColor(1);
+    } else {
+        oled.drawStr(xStatB, 58, statB);
+    }
+
+    // Khu A (Bên phải)
+    const char* statA = (availA > 0) ? "CON CHO" : "HET CHO";
+    int wStatA = oled.getStrWidth(statA);
+    int xStatA = 64 + (63 - wStatA) / 2;
+    if (availA == 0) {
+        // Nền đảo màu để cảnh báo hết chỗ nổi bật
+        oled.drawBox(66, 46, 59, 15);
+        oled.setDrawColor(0);
+        oled.drawStr(xStatA, 58, statA);
+        oled.setDrawColor(1);
+    } else {
+        oled.drawStr(xStatA, 58, statA);
+    }
 
     // Đẩy dữ liệu ra màn hình OLED
     oled.sendBuffer();

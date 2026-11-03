@@ -33,6 +33,7 @@ private:
     unsigned long eventMsgTimestamp;
     bool showingEventMsg;
     GateEvent activeEvent;
+    GateEvent lastHandledEvent;
 
     // Bộ nhớ đệm OLED để tối ưu tốc độ vẽ
     uint8_t cachedAvailA;
@@ -40,10 +41,8 @@ private:
     unsigned long lastOledRefreshTime;
 
     // Các hàm nội bộ
-    void updateLcd(uint8_t totalAvail, GateEvent lastEvent);
+    void updateLcd(uint8_t totalAvail, uint8_t availA, uint8_t availB, GateEvent lastEvent);
     void updateOled(uint8_t availA, uint8_t availB);
-    void drawArrowRight(int startX, int midY);
-    void drawArrowStraightRight(int stemX, int startY, int turnY, int endX);
 };
 
 #endif // DISPLAY_MANAGER_H

@@ -4,13 +4,13 @@
 #include "ParkingMonitor.h"
 #include "GateController.h"
 #include "DisplayManager.h"
-#include "NetworkClient.h"
+#include "ParkingNetworkClient.h"
 
 // Khởi tạo các đối tượng điều khiển hệ thống
 ParkingMonitor parking;
 GateController gate;
 DisplayManager display;
-NetworkClient  network;
+ParkingNetworkClient network;
 
 void setup() {
     Serial.begin(SERIAL_BAUD);
@@ -46,8 +46,8 @@ void setup() {
     Serial.println(F(" OK"));
     Serial.flush();
 
-    // Khởi động NetworkClient
-    Serial.print(F("[Init] NetworkClient..."));
+    // Khởi động ParkingNetworkClient
+    Serial.print(F("[Init] ParkingNetworkClient..."));
     network.begin();
     Serial.println(F(" OK"));
     Serial.flush();

@@ -69,6 +69,11 @@ void GateController::update(bool parkingFull) {
 
     switch (currentState) {
         case GATE_STATE_IDLE:
+            // Tự động giải phóng sự kiện timeout khi đã quay về IDLE
+            if (lastEvent == GATE_EVENT_TIMEOUT) {
+                lastEvent = GATE_EVENT_NONE;
+            }
+
             if (confirmedSensorOut) {
                 // Có xe tiếp cận từ phía ngoài bãi
                 if (parkingFull) {
@@ -121,6 +126,7 @@ void GateController::update(bool parkingFull) {
             if (!confirmedSensorOut && !confirmedSensorIn) {
                 closeBarrier();
                 flagJustEntered = true;
+                lastEvent = GATE_EVENT_NONE;
                 changeState(GATE_STATE_IDLE);
                 Serial.println(F("[GateController] Xe da VAO BAI HOAN TAT -> Dong barie (0 deg)."));
             }
@@ -157,6 +163,7 @@ void GateController::update(bool parkingFull) {
             if (!confirmedSensorOut && !confirmedSensorIn) {
                 closeBarrier();
                 flagJustExited = true;
+                lastEvent = GATE_EVENT_NONE;
                 changeState(GATE_STATE_IDLE);
                 Serial.println(F("[GateController] Xe da ROI BAI HOAN TAT -> Dong barie (0 deg)."));
             }
@@ -165,6 +172,7 @@ void GateController::update(bool parkingFull) {
         case GATE_STATE_BLOCKED_FULL:
             // Chờ cho đến khi xe ngoài cổng rời đi (S_OUT nhả về HIGH)
             if (!confirmedSensorOut) {
+                lastEvent = GATE_EVENT_NONE;
                 changeState(GATE_STATE_IDLE);
                 Serial.println(F("[GateController] Xe bi chan da roi di -> Tro ve trang thai IDLE."));
             }

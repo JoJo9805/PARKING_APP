@@ -1,5 +1,5 @@
-#ifndef NETWORK_CLIENT_H
-#define NETWORK_CLIENT_H
+#ifndef PARKING_NETWORK_CLIENT_H
+#define PARKING_NETWORK_CLIENT_H
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -9,9 +9,9 @@
 #include "ParkingMonitor.h"
 #include "GateController.h"
 
-class NetworkClient {
+class ParkingNetworkClient {
 public:
-    NetworkClient();
+    ParkingNetworkClient();
 
     // Khởi tạo Wi-Fi (nếu ENABLE_WIFI = true)
     void begin();
@@ -28,4 +28,5 @@ private:
     void sendTelemetry(const ParkingMonitor& parking, const GateController& gate);
 };
 
-#endif // NETWORK_CLIENT_H
+#endif // PARKING_NETWORK_CLIENT_H
+

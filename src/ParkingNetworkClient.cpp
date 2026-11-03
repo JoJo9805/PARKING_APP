@@ -1,20 +1,20 @@
-#include "NetworkClient.h"
+#include "ParkingNetworkClient.h"
 
-NetworkClient::NetworkClient()
+ParkingNetworkClient::ParkingNetworkClient()
     : lastTelemetryTime(0) {
 }
 
-void NetworkClient::begin() {
+void ParkingNetworkClient::begin() {
 #if ENABLE_WIFI
-    Serial.printf("[NetworkClient] Connecting to Wi-Fi SSID: %s ...\n", WIFI_SSID);
+    Serial.printf("[ParkingNetworkClient] Connecting to Wi-Fi SSID: %s ...\n", WIFI_SSID);
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 #else
-    Serial.println(F("[NetworkClient] Wi-Fi disabled in config.h (ENABLE_WIFI = false). Running in local mode."));
+    Serial.println(F("[ParkingNetworkClient] Wi-Fi disabled in config.h (ENABLE_WIFI = false). Running in local mode."));
 #endif
 }
 
-void NetworkClient::update(const ParkingMonitor& parking, const GateController& gate) {
+void ParkingNetworkClient::update(const ParkingMonitor& parking, const GateController& gate) {
 #if ENABLE_WIFI
     if (WiFi.status() != WL_CONNECTED) {
         return; // Chưa có kết nối, không block loop()
@@ -31,7 +31,7 @@ void NetworkClient::update(const ParkingMonitor& parking, const GateController& 
 #endif
 }
 
-bool NetworkClient::isConnected() const {
+bool ParkingNetworkClient::isConnected() const {
 #if ENABLE_WIFI
     return (WiFi.status() == WL_CONNECTED);
 #else
@@ -39,7 +39,7 @@ bool NetworkClient::isConnected() const {
 #endif
 }
 
-void NetworkClient::sendTelemetry(const ParkingMonitor& parking, const GateController& gate) {
+void ParkingNetworkClient::sendTelemetry(const ParkingMonitor& parking, const GateController& gate) {
 #if ENABLE_WIFI
     JsonDocument doc;
 
@@ -73,9 +73,9 @@ void NetworkClient::sendTelemetry(const ParkingMonitor& parking, const GateContr
 
     int httpResponseCode = http.POST(jsonString);
     if (httpResponseCode > 0) {
-        Serial.printf("[NetworkClient] Telemetry sent, HTTP Code: %d\n", httpResponseCode);
+        Serial.printf("[ParkingNetworkClient] Telemetry sent, HTTP Code: %d\n", httpResponseCode);
     } else {
-        Serial.printf("[NetworkClient] HTTP POST failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
+        Serial.printf("[ParkingNetworkClient] HTTP POST failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
     }
     http.end();
 #else
@@ -83,3 +83,4 @@ void NetworkClient::sendTelemetry(const ParkingMonitor& parking, const GateContr
     (void)gate;
 #endif
 }
+
