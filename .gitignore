@@ -4,3 +4,17 @@
 .vscode/launch.json
 .vscode/ipch
 node_modules
+
+# Python & Edge Backend
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+edge-backend/.env
+*serviceAccount*.json
+
+# Mosquitto Broker dynamic data
+edge-backend/mosquitto/passwd
+edge-backend/mosquitto/data/
+edge-backend/mosquitto/log/

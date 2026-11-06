@@ -18,18 +18,18 @@
 
 ## 2. CHI TIẾT CÁC BƯỚC CẦN LÀM TIẾP THEO (PHASES S1 → S6)
 
-### PHASE S1 — TÁI CẤU TRÚC PLATFORMIO MULTI-ENV & KHỞI TẠO MOSQUITTO BROKER
+### PHASE S1 — TÁI CẤU TRÚC PLATFORMIO MULTI-ENV & KHỞI TẠO MOSQUITTO BROKER (ĐÃ HOÀN THÀNH ✅)
 
 #### Bước S1.1: Tách cấu trúc thư mục Firmware (`gate` và `cam`)
-- [ ] Tạo thư mục `src/gate/` và di chuyển 5 file `.cpp` hiện tại (`main.cpp`, `ParkingMonitor.cpp`, `GateController.cpp`, `DisplayManager.cpp`, `ParkingNetworkClient.cpp`) vào `src/gate/`.
-- [ ] Tạo thư mục `src/cam/` và file khung `src/cam/main_cam.cpp`.
-- [ ] Cập nhật `platformio.ini`:
+- [x] Tạo thư mục `src/gate/` và di chuyển 5 file `.cpp` hiện tại (`main.cpp`, `ParkingMonitor.cpp`, `GateController.cpp`, `DisplayManager.cpp`, `ParkingNetworkClient.cpp`) vào `src/gate/`.
+- [x] Tạo thư mục `src/cam/` và file khung `src/cam/main_cam.cpp`.
+- [x] Cập nhật `platformio.ini`:
   - Thêm `build_src_filter = +<gate/*> -<cam/*>` cho `[env:nodemcu-32s]`.
   - Thêm môi trường `[env:esp32cam]` (`board = esp32cam`, `board_build.partitions = huge_app.csv`, `build_src_filter = +<cam/*> -<gate/*>`).
 
 #### Bước S1.2: Tạo Header hợp đồng mạng dùng chung (`include/common_network.h`)
-- [ ] Định nghĩa thông tin Wi-Fi, địa chỉ IP máy trạm Edge Server (`EDGE_SERVER_IP`), cổng MQTT (`1883`), cổng FastAPI (`8000`).
-- [ ] Định nghĩa tài khoản MQTT (`esp32_gate_01`, `esp32_cam_01`) và 6 hằng số Topic chuẩn:
+- [x] Định nghĩa thông tin Wi-Fi, địa chỉ IP máy trạm Edge Server (`EDGE_SERVER_IP`), cổng MQTT (`1883`), cổng FastAPI (`8000`).
+- [x] Định nghĩa tài khoản MQTT (`esp32_gate_01`, `esp32_cam_01`) và 6 hằng số Topic chuẩn:
   - `TOPIC_STATE`: `"parking/ESP32_PARKING_01/state"`
   - `TOPIC_GATE_REQUEST`: `"parking/ESP32_PARKING_01/gate/request"`
   - `TOPIC_GATE_COMMAND`: `"parking/ESP32_PARKING_01/gate/command"`
@@ -38,9 +38,9 @@
   - `TOPIC_CAM_STATUS`: `"parking/ESP32_CAM_01/status"`
 
 #### Bước S1.3: Khởi tạo cấu hình Mosquitto Broker (`edge-backend/mosquitto/`)
-- [ ] Tạo `edge-backend/mosquitto/mosquitto.conf` (`listener 1883 0.0.0.0`, `allow_anonymous false`, trỏ tới `passwd` và `acl`).
-- [ ] Tạo `edge-backend/mosquitto/acl` phân quyền đọc/ghi theo từng client.
-- [ ] Tạo `edge-backend/docker-compose.yml` để khởi chạy container `eclipse-mosquitto:2`.
+- [x] Tạo `edge-backend/mosquitto/mosquitto.conf` (`listener 1883 0.0.0.0`, `allow_anonymous false`, trỏ tới `passwd` và `acl`).
+- [x] Tạo `edge-backend/mosquitto/acl` phân quyền đọc/ghi theo từng client.
+- [x] Tạo `edge-backend/docker-compose.yml` để khởi chạy container `eclipse-mosquitto:2`.
 
 ---
 

@@ -2,11 +2,12 @@
 #define CONFIG_H
 
 #include <Arduino.h>
+#include "common_network.h"
 
 // ==========================================
 // THÔNG TIN THIẾT BỊ
 // ==========================================
-#define DEVICE_ID "ESP32_PARKING_01"
+#define DEVICE_ID DEVICE_ID_GATE
 #define SERIAL_BAUD 115200
 
 // ==========================================
@@ -48,39 +49,34 @@
 // Mức logic tích cực (LM393 xuất LOW khi phát hiện vật cản)
 #define SENSOR_ACTIVE_LEVEL LOW
 
-
 // ==========================================
 // CÁC HẰNG SỐ THỜI GIAN & AN TOÀN (NON-BLOCKING)
 // ==========================================
 #define SENSOR_DEBOUNCE_MS     250   // Chống rung tín hiệu cảm biến slot (ms)
 #define GATE_SAFETY_TIMEOUT_MS 10000 // Tự động hạ barie nếu xe không qua sau 10s
 #define GATE_SERVO_DELAY_MS    300   // Thời gian servo hoàn thành chuyển động trước khi chốt trạng thái
+#define GATE_AUTH_TIMEOUT_MS   8000  // Fallback mở cổng cục bộ nếu Backend không phản hồi sau 8s
 #define DISPLAY_REFRESH_MS     200   // Chu kỳ làm tươi màn hình (ms)
 #define LCD_MSG_DURATION_MS    2500  // Thời gian hiển thị lời chào "MOI VAO" / "TAM BIET" (ms)
 
 // ==========================================
 // CẤU HÌNH KẾT NỐI IOT (WIFI & BACKEND)
 // ==========================================
-// Chế độ mạng: Bật/Tắt chế độ chỉ in log qua Serial nếu chưa cấu hình Wi-Fi
-#define ENABLE_WIFI false            // Đổi thành true khi bạn muốn kích hoạt Wi-Fi thực tế
-#define WIFI_SSID     "Your_WiFi_SSID"
-#define WIFI_PASSWORD "Your_WiFi_Password"
-
 // Lựa chọn phương thức truyền tải:
 // 1 = HTTP POST REST API, 2 = MQTT
 #define PROTOCOL_HTTP 1
 #define PROTOCOL_MQTT 2
-#define IOT_PROTOCOL  PROTOCOL_HTTP
+#define IOT_PROTOCOL  PROTOCOL_MQTT
 
-// Cấu hình HTTP Backend
+// Cấu hình HTTP Backend cũ (dự phòng)
 #define BACKEND_HTTP_URL "http://192.168.1.100:8080/api/parking/telemetry"
 #define HTTP_TIMEOUT_MS  3000
 
-// Cấu hình MQTT Broker
-#define MQTT_BROKER   "broker.hivemq.com"
-#define MQTT_PORT     1883
-#define MQTT_TOPIC    "parking/state"
-#define MQTT_CLIENT_ID "ESP32_SmartParking"
+// Cấu hình MQTT Broker (kế thừa từ common_network.h)
+#define MQTT_BROKER    MQTT_BROKER_HOST
+#define MQTT_PORT      MQTT_BROKER_PORT
+#define MQTT_TOPIC     TOPIC_STATE
+#define MQTT_CLIENT_ID DEVICE_ID_GATE
 
 // Chu kỳ tự động gửi dữ liệu Telemetry lên Backend (ms)
 #define TELEMETRY_INTERVAL_MS 5000

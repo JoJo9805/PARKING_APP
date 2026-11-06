@@ -1,0 +1,17 @@
+# File danh sách tài khoản & mật khẩu mẫu trước khi băm bằng mosquitto_passwd
+#
+# Cách tạo file passwd thật cho Mosquitto:
+# 1) Nếu chạy Docker:
+#    docker run --rm -v ${PWD}/edge-backend/mosquitto:/mosquitto/config eclipse-mosquitto:2 mosquitto_passwd -c -b /mosquitto/config/passwd esp32_gate_01 gate_secret_2026
+#    docker run --rm -v ${PWD}/edge-backend/mosquitto:/mosquitto/config eclipse-mosquitto:2 mosquitto_passwd -b /mosquitto/config/passwd esp32_cam_01 cam_secret_2026
+#    docker run --rm -v ${PWD}/edge-backend/mosquitto:/mosquitto/config eclipse-mosquitto:2 mosquitto_passwd -b /mosquitto/config/passwd edge_server edge_secret_2026
+#
+# 2) Hoặc lệnh trên Linux/Windows có cài sẵn mosquitto:
+#    mosquitto_passwd -c -b passwd esp32_gate_01 gate_secret_2026
+#    mosquitto_passwd -b passwd esp32_cam_01 cam_secret_2026
+#    mosquitto_passwd -b passwd edge_server edge_secret_2026
+
+esp32_gate_01:gate_secret_2026
+esp32_cam_01:cam_secret_2026
+edge_server:edge_secret_2026
+
