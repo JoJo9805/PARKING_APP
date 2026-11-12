@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Quyền truy cập mạng -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Quyền vị trí -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Quyền thông báo (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Quyền dịch vụ nền -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:name=".ParkingApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/ic_notification"
+        android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
+        android:roundIcon="@drawable/ic_notification"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.IOTParking"
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="35">
+
+        <!-- Activity chính -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.IOTParking.Splash"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Firebase Cloud Messaging Service -->
+        <service
+            android:name=".core.notification.ParkingMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- BroadcastReceiver xử lý hành động từ thông báo -->
+        <receiver
+            android:name=".core.notification.ActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.iotparking.app.ACTION_EXTEND_RESERVATION" />
+                <action android:name="com.iotparking.app.ACTION_NAVIGATE_TO_LOT" />
+                <action android:name="com.iotparking.app.ACTION_END_SESSION" />
+                <action android:name="com.iotparking.app.ACTION_VIEW_INVOICE" />
+                <action android:name="com.iotparking.app.ACTION_DISMISS_ONGOING" />
+                <action android:name="com.iotparking.app.ACTION_EXTEND_SESSION_30" />
+                <action android:name="com.iotparking.app.ACTION_EXTEND_SESSION_60" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Glance App Widget Receiver -->
+        <receiver
+            android:name=".widget.ParkingWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/parking_widget_info" />
+        </receiver>
+
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
+        <!-- Kênh thông báo FCM mặc định -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="parking_notifications" />
+
+        <!-- Biểu tượng thông báo FCM mặc định -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+
+        <!-- Màu thông báo FCM mặc định -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/primary" />
+
+        <!-- WorkManager Initializer bằng Hilt -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,33 @@
+[
+  {
+    "raw": "51A-123.45",
+    "expectedNormalized": "51A12345",
+    "isValid": true,
+    "description": "Standard 5-digit car plate with dash and dot"
+  },
+  {
+    "raw": " 29C1 - 999.88 ",
+    "expectedNormalized": "29C199988",
+    "isValid": true,
+    "description": "Motorbike plate with spaces and special characters"
+  },
+  {
+    "raw": "43A-1234",
+    "expectedNormalized": "43A1234",
+    "isValid": true,
+    "description": "Old 4-digit car plate"
+  },
+  {
+    "raw": "30E 678.90",
+    "expectedNormalized": "30E67890",
+    "isValid": true,
+    "description": "Plate with space instead of hyphen"
+  },
+  {
+    "raw": "INVALID_PLATE",
+    "expectedNormalized": "INVALIDPLATE",
+    "isValid": false,
+    "description": "Invalid format"
+  }
+]
+

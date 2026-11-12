@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "123456789012",
+    "project_id": "iot-parking-smart",
+    "storage_bucket": "iot-parking-smart.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789012:android:abcdef0123456789",
+        "android_client_info": {
+          "package_name": "com.iotparking.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDummyKeyForDevelopment123456789"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789012:android:debug01234567890",
+        "android_client_info": {
+          "package_name": "com.iotparking.app.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDummyKeyForDevelopment123456789"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

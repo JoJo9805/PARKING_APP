@@ -1,0 +1,69 @@
+[
+  {
+    "description": "Short stay within grace period (0 grace min, 10 min duration)",
+    "durationMin": 10,
+    "graceMinutes": 0,
+    "blockMinutes": 30,
+    "pricePerBlock": 5000,
+    "depositApplied": 5000,
+    "expectedFee": 5000,
+    "expectedDepositRefund": 0,
+    "expectedAmountCharged": 0
+  },
+  {
+    "description": "Stay within grace period (>0 grace min)",
+    "durationMin": 5,
+    "graceMinutes": 10,
+    "blockMinutes": 30,
+    "pricePerBlock": 5000,
+    "depositApplied": 5000,
+    "expectedFee": 0,
+    "expectedDepositRefund": 5000,
+    "expectedAmountCharged": 0
+  },
+  {
+    "description": "Exactly 1 block (30 min)",
+    "durationMin": 30,
+    "graceMinutes": 0,
+    "blockMinutes": 30,
+    "pricePerBlock": 5000,
+    "depositApplied": 5000,
+    "expectedFee": 5000,
+    "expectedDepositRefund": 0,
+    "expectedAmountCharged": 0
+  },
+  {
+    "description": "1 block + 1 minute (31 min) -> 2 blocks",
+    "durationMin": 31,
+    "graceMinutes": 0,
+    "blockMinutes": 30,
+    "pricePerBlock": 5000,
+    "depositApplied": 5000,
+    "expectedFee": 10000,
+    "expectedDepositRefund": 0,
+    "expectedAmountCharged": 5000
+  },
+  {
+    "description": "Long stay 75 min -> 3 blocks without deposit",
+    "durationMin": 75,
+    "graceMinutes": 0,
+    "blockMinutes": 30,
+    "pricePerBlock": 5000,
+    "depositApplied": 0,
+    "expectedFee": 15000,
+    "expectedDepositRefund": 0,
+    "expectedAmountCharged": 15000
+  },
+  {
+    "description": "Fee less than deposit with grace period (Hoàn cọc dư)",
+    "durationMin": 3,
+    "graceMinutes": 5,
+    "blockMinutes": 30,
+    "pricePerBlock": 5000,
+    "depositApplied": 5000,
+    "expectedFee": 0,
+    "expectedDepositRefund": 5000,
+    "expectedAmountCharged": 0
+  }
+]
+

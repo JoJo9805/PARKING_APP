@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IOT Parking</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Hủy</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="save">Lưu</string>
+    <string name="delete">Xóa</string>
+    <string name="retry">Thử lại</string>
+    <string name="close">Đóng</string>
+    <string name="back">Quay lại</string>
+    <string name="loading">Đang tải…</string>
+    <string name="error_generic">Đã xảy ra lỗi. Vui lòng thử lại.</string>
+    <string name="error_network">Không có kết nối mạng.</string>
+    <string name="error_timeout">Yêu cầu hết thời gian. Vui lòng thử lại.</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+
+    <!-- Offline Banner -->
+    <string name="offline_banner_text">Đang ngoại tuyến</string>
+
+    <!-- Active Banner -->
+    <string name="active_reservation_banner">Đặt chỗ %1$s — Còn %2$s</string>
+    <string name="active_session_banner">Đang đỗ tại %1$s — %2$s</string>
+    <string name="tap_to_view">Nhấn để xem</string>
+
+    <!-- Empty State -->
+    <string name="empty_state_default_title">Chưa có gì</string>
+    <string name="empty_state_default_description">Chưa có dữ liệu để hiển thị.</string>
+
+    <!-- Error Dialog -->
+    <string name="error_dialog_title">Lỗi</string>
+
+    <!-- Confirm Dialog -->
+    <string name="confirm_dialog_title">Xác nhận</string>
+
+    <!-- Auth -->
+    <string name="login_title">Đăng nhập</string>
+    <string name="register_title">Đăng ký</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Mật khẩu</string>
+    <string name="confirm_password_label">Xác nhận mật khẩu</string>
+    <string name="display_name_label">Tên hiển thị</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="forgot_password_title">Đặt lại mật khẩu</string>
+    <string name="sign_in_button">Đăng nhập</string>
+    <string name="demo_login_button">Đăng nhập nhanh Demo</string>
+    <string name="sign_up_button">Đăng ký</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="has_account">Đã có tài khoản?</string>
+    <string name="send_reset_email">Gửi email đặt lại</string>
+    <string name="reset_email_sent">Đã gửi email đặt lại mật khẩu.</string>
+    <string name="change_password_title">Đổi mật khẩu</string>
+    <string name="current_password_label">Mật khẩu hiện tại</string>
+    <string name="new_password_label">Mật khẩu mới</string>
+    <string name="change_password_button">Đổi mật khẩu</string>
+    <string name="password_changed_success">Đổi mật khẩu thành công.</string>
+    <string name="sign_out">Đăng xuất</string>
+    <string name="sign_out_confirm">Bạn có chắc chắn muốn đăng xuất?</string>
+    <string name="email_not_verified">Vui lòng xác minh email trước khi tiếp tục.</string>
+    <string name="send_verification_email">Gửi email xác minh</string>
+    <string name="verification_email_sent">Đã gửi email xác minh. Vui lòng kiểm tra hộp thư.</string>
+
+    <!-- Validation -->
+    <string name="error_email_required">Vui lòng nhập email.</string>
+    <string name="error_email_invalid">Email không hợp lệ.</string>
+    <string name="error_password_required">Vui lòng nhập mật khẩu.</string>
+    <string name="error_password_too_short">Mật khẩu phải có ít nhất 6 ký tự.</string>
+    <string name="error_passwords_mismatch">Mật khẩu không khớp.</string>
+    <string name="error_display_name_required">Vui lòng nhập tên hiển thị.</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_explore">Khám phá</string>
+    <string name="nav_activity">Hoạt động</string>
+    <string name="nav_history">Lịch sử</string>
+    <string name="nav_wallet">Ví</string>
+    <string name="nav_account">Tài khoản</string>
+
+    <!-- Lot -->
+    <string name="lot_detail_title">Bãi đỗ xe</string>
+    <string name="lot_available_slots">%1$d / %2$d chỗ trống</string>
+    <string name="lot_price_per_block">%1$s / %2$d phút</string>
+    <string name="lot_distance">Cách %1$s</string>
+    <string name="lot_device_online">Thiết bị trực tuyến</string>
+    <string name="lot_device_offline">Thiết bị ngoại tuyến</string>
+    <string name="lot_has_roof">Có mái che</string>
+    <string name="lot_has_ev">Sạc xe điện</string>
+    <string name="lot_select_slot">Chọn chỗ đỗ</string>
+
+    <!-- Slot -->
+    <string name="slot_available">Trống</string>
+    <string name="slot_occupied">Đang đỗ</string>
+    <string name="slot_reserved">Đã đặt</string>
+    <string name="slot_zone_a">Khu A</string>
+    <string name="slot_zone_b">Khu B</string>
+    <string name="slot_select">Chọn chỗ</string>
+
+    <!-- Reservation -->
+    <string name="reservation_confirm_title">Xác nhận đặt chỗ</string>
+    <string name="reservation_deposit">Tiền cọc: %1$s</string>
+    <string name="reservation_hold_duration">Giữ chỗ trong %1$d phút</string>
+    <string name="reservation_free_cancel">Hủy miễn phí trong %1$d phút</string>
+    <string name="reservation_confirm_button">Đặt chỗ ngay</string>
+    <string name="reservation_cancel">Hủy đặt chỗ</string>
+    <string name="reservation_cancel_confirm">Bạn có chắc chắn muốn hủy đặt chỗ?</string>
+    <string name="reservation_extend">Gia hạn đặt chỗ</string>
+    <string name="reservation_extend_confirm">Gia hạn đặt chỗ thêm %1$d phút?</string>
+    <string name="reservation_active_title">Đặt chỗ đang hoạt động</string>
+    <string name="reservation_expires_in">Hết hạn sau %1$s</string>
+    <string name="reservation_expired">Đặt chỗ đã hết hạn</string>
+    <string name="reservation_status_active">Đang hoạt động</string>
+    <string name="reservation_status_fulfilled">Đã hoàn thành</string>
+    <string name="reservation_status_expired">Đã hết hạn</string>
+    <string name="reservation_status_cancelled">Đã hủy</string>
+    <string name="deposit_status_held">Đang giữ</string>
+    <string name="deposit_status_applied">Đã áp dụng</string>
+    <string name="deposit_status_refunded">Đã hoàn</string>
+    <string name="deposit_status_forfeited">Đã mất</string>
+
+    <!-- Session -->
+    <string name="session_active_title">Phiên đỗ xe đang hoạt động</string>
+    <string name="session_duration">Thời gian: %1$s</string>
+    <string name="session_running_fee">Phí tạm tính: %1$s</string>
+    <string name="session_entry_time">Vào: %1$s</string>
+    <string name="session_exit_time">Ra: %1$s</string>
+    <string name="session_total_fee">Tổng phí: %1$s</string>
+    <string name="session_deposit_applied">Tiền cọc đã dùng: %1$s</string>
+    <string name="session_amount_charged">Số tiền thu: %1$s</string>
+    <string name="session_deposit_refund">Hoàn cọc: %1$s</string>
+    <string name="session_status_active">Đang đỗ</string>
+    <string name="session_status_completed">Đã hoàn thành</string>
+    <string name="session_extend_planned">Gia hạn thời gian dự kiến</string>
+
+    <!-- History -->
+    <string name="history_title">Lịch sử đỗ xe</string>
+    <string name="history_empty_title">Chưa có lịch sử</string>
+    <string name="history_empty_description">Các phiên đỗ xe đã hoàn thành sẽ hiển thị ở đây.</string>
+
+    <!-- Invoice -->
+    <string name="invoice_title">Hóa đơn</string>
+    <string name="invoice_no">Hóa đơn #%1$s</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">Thống kê</string>
+
+    <!-- Wallet -->
+    <string name="wallet_title">Ví</string>
+    <string name="wallet_balance">Số dư</string>
+    <string name="wallet_top_up">Nạp tiền</string>
+    <string name="wallet_transaction_history">Lịch sử giao dịch</string>
+    <string name="wallet_add_card">Thêm thẻ</string>
+    <string name="wallet_no_transactions_title">Chưa có giao dịch</string>
+    <string name="wallet_no_transactions_description">Các giao dịch của bạn sẽ hiển thị ở đây.</string>
+
+    <!-- Transaction Types -->
+    <string name="transaction_topup">Nạp tiền</string>
+    <string name="transaction_reservation_deposit">Tiền cọc đặt chỗ</string>
+    <string name="transaction_deposit_refund">Hoàn cọc</string>
+    <string name="transaction_deposit_excess_refund">Hoàn cọc dư</string>
+    <string name="transaction_parking_fee">Phí đỗ xe</string>
+    <string name="transaction_adjustment">Điều chỉnh</string>
+
+    <!-- Payment Method -->
+    <string name="payment_method_title">Phương thức thanh toán</string>
+    <string name="payment_method_add">Thêm phương thức thanh toán</string>
+    <string name="payment_method_remove">Xóa</string>
+    <string name="payment_method_remove_confirm">Xóa phương thức thanh toán này?</string>
+    <string name="payment_method_set_default">Đặt làm mặc định</string>
+    <string name="payment_method_default_label">Mặc định</string>
+    <string name="payment_method_card_number_label">Số thẻ</string>
+    <string name="payment_method_holder_name_label">Tên chủ thẻ</string>
+    <string name="payment_method_no_cards_title">Chưa có thẻ</string>
+    <string name="payment_method_no_cards_description">Thêm thẻ để nạp tiền vào ví.</string>
+
+    <!-- Vehicle -->
+    <string name="vehicle_title">Xe của tôi</string>
+    <string name="vehicle_add">Thêm xe</string>
+    <string name="vehicle_remove">Xóa xe</string>
+    <string name="vehicle_remove_confirm">Xóa xe này?</string>
+    <string name="vehicle_plate_label">Biển số xe</string>
+    <string name="vehicle_nickname_label">Tên gọi</string>
+    <string name="vehicle_type_car">Ô tô</string>
+    <string name="vehicle_type_motorbike">Xe máy</string>
+    <string name="vehicle_no_vehicles_title">Chưa có xe</string>
+    <string name="vehicle_no_vehicles_description">Thêm xe để bắt đầu đỗ xe.</string>
+    <string name="vehicle_plate_invalid">Biển số xe Việt Nam không hợp lệ.</string>
+
+    <!-- Notification -->
+    <string name="notification_title">Thông báo</string>
+    <string name="notification_mark_all_read">Đánh dấu tất cả đã đọc</string>
+    <string name="notification_empty_title">Không có thông báo</string>
+    <string name="notification_empty_description">Bạn đã xem hết tất cả!</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_theme">Giao diện</string>
+    <string name="settings_theme_light">Sáng</string>
+    <string name="settings_theme_dark">Tối</string>
+    <string name="settings_theme_system">Theo hệ thống</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_language_vi">Tiếng Việt</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_reminder">Nhắc nhở</string>
+    <string name="settings_reminder_enabled">Bật nhắc nhở</string>
+    <string name="settings_reminder_minutes">Nhắc trước %1$d phút</string>
+    <string name="settings_planned_duration">Thời gian dự kiến mặc định</string>
+    <string name="settings_planned_duration_value">%1$d phút</string>
+    <string name="settings_change_password">Đổi mật khẩu</string>
+    <string name="settings_about">Giới thiệu</string>
+    <string name="settings_version">Phiên bản %1$s</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Tìm bãi đỗ dễ dàng</string>
+    <string name="onboarding_desc_1">Khám phá các bãi đỗ xe gần bạn với thông tin chỗ trống thời gian thực.</string>
+    <string name="onboarding_title_2">Đặt chỗ trước</string>
+    <string name="onboarding_desc_2">Đặt trước chỗ đỗ và không phải lo lắng tìm chỗ.</string>
+    <string name="onboarding_title_3">Thanh toán thông minh</string>
+    <string name="onboarding_desc_3">Thanh toán dễ dàng bằng ví điện tử. Nạp tiền mọi lúc.</string>
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_next">Tiếp theo</string>
+    <string name="onboarding_get_started">Bắt đầu</string>
+
+    <!-- Currency -->
+    <string name="currency_vnd">%1$s₫</string>
+    <string name="currency_vnd_format">%1$,d₫</string>
+
+    <!-- Time -->
+    <string name="time_minutes">%1$d phút</string>
+    <string name="time_hours_minutes">%1$d giờ %2$d phút</string>
+    <string name="time_just_now">Vừa xong</string>
+    <string name="time_ago_minutes">%1$d phút trước</string>
+    <string name="time_ago_hours">%1$d giờ trước</string>
+    <string name="time_ago_days">%1$d ngày trước</string>
+
+    <!-- Splash -->
+    <string name="splash_subtitle">Giải pháp đỗ xe thông minh</string>
+
+    <!-- Widget -->
+    <string name="widget_description">Hiển thị trạng thái đỗ xe hoặc lượt giữ chỗ hiện tại</string>
+
+    <!-- Navigation Tabs -->
+    <string name="tab_explore">Khám phá</string>
+    <string name="tab_activity">Hoạt động</string>
+    <string name="tab_history">Lịch sử</string>
+    <string name="tab_wallet">Ví</string>
+    <string name="tab_account">Tài khoản</string>
+
+    <!-- Screen Titles -->
+    <string name="select_slot_title">Chọn vị trí đỗ xe</string>
+    <string name="active_reservation_title">Lượt giữ chỗ hiện tại</string>
+    <string name="active_session_title">Phiên đỗ xe hiện tại</string>
+    <string name="invoice_detail_title">Chi tiết hóa đơn</string>
+    <string name="card_management_title">Thẻ thanh toán</string>
+    <string name="vehicles_title">Phương tiện của tôi</string>
+    <string name="add_vehicle_title">Thêm phương tiện</string>
+    <string name="inbox_title">Hộp thư thông báo</string>
+    <string name="filter_title">Bộ lọc &amp; Sắp xếp</string>
+    <string name="register_subtitle">Tạo tài khoản để bắt đầu sử dụng</string>
+    <string name="forgot_password_desc">Nhập địa chỉ email của bạn, chúng tôi sẽ gửi liên kết để đặt lại mật khẩu.</string>
+    <string name="send_reset_link">Gửi liên kết đặt lại</string>
+    <string name="password_strength_strong">Mạnh</string>
+    <string name="password_strength_medium">Trung bình</string>
+    <string name="password_strength_weak">Yếu</string>
+
+    <!-- Notification Channels -->
+    <string name="notif_channel_parking_events">Sự kiện đỗ xe</string>
+    <string name="notif_channel_parking_events_desc">Thông báo khi xe vào hoặc ra bãi</string>
+    <string name="notif_channel_reservation">Đặt chỗ</string>
+    <string name="notif_channel_reservation_desc">Cảnh báo và cập nhật hạn giữ chỗ</string>
+    <string name="notif_channel_reminders">Nhắc nhở</string>
+    <string name="notif_channel_reminders_desc">Nhắc nhở về thời lượng đỗ xe dự kiến</string>
+    <string name="notif_channel_wallet">Ví</string>
+    <string name="notif_channel_wallet_desc">Thay đổi số dư ví và giao dịch</string>
+    <string name="notif_channel_ongoing_session">Phiên đỗ xe đang diễn ra</string>
+    <string name="notif_channel_ongoing_session_desc">Đồng hồ đếm thời gian đỗ xe thời gian thực</string>
+
+    <!-- Notification Messages -->
+    <string name="notif_ongoing_title">Đang đỗ xe tại %1$s</string>
+    <string name="notif_ongoing_text">Ô %1$s</string>
+    <string name="notif_vehicle_entered_title">Xe %1$s đã vào bãi</string>
+    <string name="notif_vehicle_entered_body">Đã vào bãi %1$s — Ô %2$s</string>
+    <string name="notif_vehicle_exited_title">Xe đã ra khỏi bãi</string>
+    <string name="notif_vehicle_exited_body">Tổng thanh toán: %1$sđ. Chạm để xem hóa đơn.</string>
+    <string name="notif_vehicle_exited_body_refund">Tổng thanh toán: %1$sđ (Hoàn cọc dư: +%2$sđ). Chạm để xem hóa đơn.</string>
+    <string name="notif_reservation_expiring_title">Giữ chỗ sắp hết hạn</string>
+    <string name="notif_reservation_expiring_body">Lượt giữ chỗ tại %1$s (Ô %2$s) sắp hết hạn.</string>
+    <string name="notif_reservation_expired_title">Lượt giữ chỗ đã hết hạn</string>
+    <string name="notif_reservation_expired_body">Lượt giữ chỗ tại %1$s (Ô %2$s) đã hết hạn.</string>
+    <string name="notif_planned_near_title">Sắp hết thời gian đỗ dự kiến</string>
+    <string name="notif_planned_near_body">Phiên đỗ tại %1$s (Ô %2$s) sắp đến giờ dự kiến.</string>
+    <string name="notif_wallet_changed_title">Biến động số dư ví</string>
+    <string name="notif_wallet_changed_body">Số tiền: %1$sđ. Số dư mới: %2$sđ.</string>
+
+    <!-- Actions & Worker messages -->
+    <string name="action_extend_15m">Gia hạn +15p</string>
+    <string name="action_extend_30m">Gia hạn +30p</string>
+    <string name="action_extend_1h">Gia hạn +1h</string>
+    <string name="reservation_extended_title">Đã gia hạn giữ chỗ</string>
+    <string name="reservation_extended_body">Lượt giữ chỗ của bạn đã được gia hạn thêm 15 phút.</string>
+    <string name="session_extended_title">Đã gia hạn phiên đỗ</string>
+    <string name="session_extended_body">Thời lượng đỗ dự kiến đã được cộng thêm %1$d phút.</string>
+    <string name="extend_failed">Gia hạn thất bại. Vui lòng thử lại.</string>
+</resources>
