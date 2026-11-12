@@ -4,6 +4,10 @@
 export const REGION = "asia-southeast1";
 
 export const BUSINESS_CONFIG = {
+  // Thiết bị & Bãi Live mặc định (Chuẩn Repo 1)
+  DEFAULT_LOT_ID: "lot_live_01",
+  DEFAULT_DEVICE_ID: "ESP32_PARKING_01",
+
   // Bãi đỗ & Block tính phí mặc định
   DEFAULT_PRICE_PER_BLOCK: 5000, // 5.000đ
   DEFAULT_BLOCK_MINUTES: 30,     // 30 phút/block

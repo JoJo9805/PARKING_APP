@@ -1,22 +1,32 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { REGION } from "../config";
+import { REGION, BUSINESS_CONFIG } from "../config";
 import { PlateUtils } from "../domain/plateUtils";
-import { FeeCalculator } from "../domain/feeCalculator";
+import { SessionService } from "../domain/sessionService";
+import { assertAdmin } from "./_auth";
 
+/**
+ * Callable adminCorrectPlate: Quản trị viên đính chính biển số xe
+ * khi camera OCR nhận diện sai hoặc nhận diện thiếu.
+ */
 export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Vui lòng đăng nhập quyền quản trị.");
-  }
+  assertAdmin(request);
+
   const { gateEventId, newPlateDisplay } = request.data || {};
 
   if (!gateEventId || !newPlateDisplay) {
-    throw new HttpsError("invalid-argument", "Thiếu tham số gateEventId hoặc newPlateDisplay.");
+    throw new HttpsError(
+      "invalid-argument",
+      "Thiếu tham số gateEventId hoặc newPlateDisplay."
+    );
   }
 
   const normalized = PlateUtils.normalize(newPlateDisplay);
   if (!PlateUtils.isValid(normalized)) {
-    throw new HttpsError("invalid-argument", "Biển số mới không đúng định dạng.");
+    throw new HttpsError(
+      "invalid-argument",
+      "Biển số mới không đúng định dạng Việt Nam."
+    );
   }
 
   const db = admin.firestore();
@@ -27,40 +37,63 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
     throw new HttpsError("not-found", "Không tìm thấy sự kiện cổng.");
   }
 
-  // Cập nhật gateEvent
-  await eventRef.update({
-    plateNormalized: normalized,
-    plateRaw: newPlateDisplay,
-    isManualCorrected: true,
-    correctedBy: request.auth.uid,
-    correctedAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+  const eventData = eventDoc.data() || {};
+  const oldPlate = eventData.plateNormalized || "";
+  const direction = (eventData.direction || "in").toLowerCase();
 
-  // Tìm chủ xe trong vehicles
+  // Tìm chủ xe trong bảng vehicles
   let linkedUid = "";
   const vehicleDoc = await db.collection("vehicles").doc(normalized).get();
   if (vehicleDoc.exists) {
     linkedUid = vehicleDoc.data()?.ownerUid || "";
   }
 
-  // Tìm session tương ứng để cập nhật biển số & gắn chủ xe
-  let sessionId = "";
-  const sessions = await db
-    .collection("sessions")
-    .where("status", "==", "active")
-    .where("plate", "==", eventDoc.data()?.plateNormalized)
-    .limit(1)
-    .get();
+  let sessionId = eventData.sessionId || "";
 
-  if (!sessions.empty) {
-    const sDoc = sessions.docs[0];
-    sessionId = sDoc.id;
-    await sDoc.ref.update({
-      plate: normalized,
-      plateDisplay: PlateUtils.formatDisplay(normalized),
-      ...(linkedUid ? { uid: linkedUid } : {}),
-    });
+  // 1. Nếu có session đang active với biển số cũ
+  if (oldPlate) {
+    const sessions = await db
+      .collection("sessions")
+      .where("status", "==", "active")
+      .where("plate", "==", oldPlate)
+      .limit(1)
+      .get();
+
+    if (!sessions.empty) {
+      const sDoc = sessions.docs[0];
+      sessionId = sDoc.id;
+      await sDoc.ref.update({
+        plate: normalized,
+        plateDisplay: PlateUtils.formatDisplay(normalized),
+        ...(linkedUid ? { uid: linkedUid } : {}),
+      });
+    }
   }
+
+  // 2. Fix B6: Nếu chưa có session và là sự kiện vào cổng (xe bị từ chối trước đó)
+  if (!sessionId && direction === "in") {
+    const openRes = await SessionService.openSession({
+      plateNormalized: normalized,
+      lotId: eventData.lotId || BUSINESS_CONFIG.DEFAULT_LOT_ID,
+      imageUrl: eventData.imageUrl || eventData.cropImageUrl || "",
+      assignedSlotId: eventData.assignedSlotId,
+    });
+    sessionId = openRes.sessionId;
+    linkedUid = openRes.sessionUid || linkedUid;
+  }
+
+  // Cập nhật lại gateEvent
+  await eventRef.update({
+    plateNormalized: normalized,
+    plateRaw: newPlateDisplay,
+    plateDisplay: PlateUtils.formatDisplay(normalized),
+    isManualCorrected: true,
+    correctedBy: request.auth?.uid,
+    correctedAt: admin.firestore.FieldValue.serverTimestamp(),
+    decision: "accepted",
+    sessionId: sessionId || admin.firestore.FieldValue.delete(),
+    status: "processed",
+  });
 
   return {
     sessionId,
@@ -68,148 +101,91 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
   };
 });
 
+/**
+ * Callable adminOpenGate: Quản trị viên mở barie khẩn cấp từ Web Admin.
+ * Gửi lệnh deviceCommands (action: OPEN_GATE) tới Edge Server / ESP32.
+ */
 export const adminOpenGate = onCall({ region: REGION }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Vui lòng đăng nhập quyền quản trị.");
-  }
-  const { deviceId, direction } = request.data || {};
+  assertAdmin(request);
 
-  if (!deviceId) {
-    throw new HttpsError("invalid-argument", "Thiếu deviceId.");
-  }
-
+  let { deviceId, direction } = request.data || {};
   const db = admin.firestore();
+
+  // Fix B2: Nếu không truyền deviceId, tự tra cứu từ lot_live_01 hoặc dùng default
+  if (!deviceId) {
+    const lotDoc = await db.collection("lots").doc(BUSINESS_CONFIG.DEFAULT_LOT_ID).get();
+    if (lotDoc.exists) {
+      deviceId = lotDoc.data()?.deviceId || BUSINESS_CONFIG.DEFAULT_DEVICE_ID;
+    } else {
+      deviceId = BUSINESS_CONFIG.DEFAULT_DEVICE_ID;
+    }
+  }
+
   const cmdRef = db.collection("deviceCommands").doc();
 
+  // Fix B1: Edge Server nhận diện action "OPEN_GATE"
   await cmdRef.set({
     deviceId,
-    action: "open_barrier",
+    action: "OPEN_GATE",
     payload: {
       direction: direction || "in",
+      reason: "admin_manual_open",
     },
     status: "pending",
-    createdBy: request.auth.uid,
+    createdBy: request.auth?.uid,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
   return { commandId: cmdRef.id };
 });
 
+/**
+ * Callable adminCloseSession: Quản trị viên đóng phiên đỗ thủ công từ Web Admin.
+ * Sử dụng SessionService.closeSession để tính tiền, hoàn cọc dư và gửi FCM.
+ */
 export const adminCloseSession = onCall({ region: REGION }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Vui lòng đăng nhập quyền quản trị.");
-  }
-  const { sessionId, exitTimeMs, waiveFee } = request.data || {};
+  assertAdmin(request);
+
+  const { sessionId, exitTimeMs, waiveFee, closeReason } = request.data || {};
 
   if (!sessionId) {
     throw new HttpsError("invalid-argument", "Thiếu sessionId.");
   }
 
-  const db = admin.firestore();
-  const sessionRef = db.collection("sessions").doc(sessionId);
-
-  let resultFee = 0;
-  let resultAmountCharged = 0;
-  let resultDepositRefund = 0;
-
-  await db.runTransaction(async (transaction) => {
-    const sessionDoc = await transaction.get(sessionRef);
-    if (!sessionDoc.exists) {
-      throw new HttpsError("not-found", "Không tìm thấy phiên đỗ.");
-    }
-    const data = sessionDoc.data();
-    if (data?.status !== "active") {
-      throw new HttpsError("failed-precondition", "Phiên đỗ không còn hoạt động.");
-    }
-
-    const entryTimeMs = data?.entryTime?.toMillis() || Date.now();
-    const effectiveExitMs = exitTimeMs ? Number(exitTimeMs) : Date.now();
-    const durationMin = Math.max(0, Math.round((effectiveExitMs - entryTimeMs) / 60000));
-
-    // Lấy cấu hình giá bãi
-    let pricePerBlock = 5000;
-    let blockMinutes = 30;
-    let graceMinutes = 0;
-    const lotRef = db.collection("lots").doc(data?.lotId || "lot_live_01");
-    const lotDoc = await transaction.get(lotRef);
-    if (lotDoc.exists) {
-      const lotData = lotDoc.data();
-      pricePerBlock = lotData?.pricePerBlock || 5000;
-      blockMinutes = lotData?.blockMinutes || 30;
-      graceMinutes = lotData?.graceMinutes || 0;
-    }
-
-    const depositApplied = Number(data?.depositApplied || 0);
-
-    if (waiveFee === true) {
-      resultFee = 0;
-      resultAmountCharged = 0;
-      resultDepositRefund = depositApplied;
-    } else {
-      const feeRes = FeeCalculator.calculateFee(
-        durationMin,
-        graceMinutes,
-        blockMinutes,
-        pricePerBlock,
-        depositApplied
-      );
-      resultFee = feeRes.fee;
-      resultAmountCharged = feeRes.amountCharged;
-      resultDepositRefund = feeRes.depositRefund;
-    }
-
-    // Nếu có uid thì điều chỉnh ví
-    const uid = data?.uid;
-    if (uid) {
-      const userRef = db.collection("users").doc(uid);
-      const userDoc = await transaction.get(userRef);
-      if (userDoc.exists) {
-        const currentBal = Number(userDoc.data()?.walletBalance || 0);
-        const newBal = currentBal - resultAmountCharged + resultDepositRefund;
-        transaction.update(userRef, { walletBalance: newBal });
-      }
-    }
-
-    // Đóng session
-    transaction.update(sessionRef, {
-      status: "completed",
-      exitTime: admin.firestore.Timestamp.fromMillis(effectiveExitMs),
-      durationMin,
-      fee: resultFee,
-      depositRefund: resultDepositRefund,
-      amountCharged: resultAmountCharged,
+  try {
+    const res = await SessionService.closeSession({
+      sessionId,
+      exitTimeMs: exitTimeMs ? Number(exitTimeMs) : Date.now(),
+      waiveFee: Boolean(waiveFee),
       closedByAdmin: true,
+      closeReason: closeReason || "Quản trị viên đóng phiên thủ công",
     });
 
-    // Giải phóng slot
-    const slotId = data?.actualSlotId || data?.assignedSlotId;
-    if (slotId && data?.lotId) {
-      const slotRef = db.collection("lots").doc(data.lotId).collection("slots").doc(slotId);
-      transaction.update(slotRef, {
-        status: "available",
-        sessionId: null,
-        reservationId: null,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-    }
-  });
-
-  return {
-    fee: resultFee,
-    amountCharged: resultAmountCharged,
-    depositRefund: resultDepositRefund,
-  };
+    return {
+      fee: res.fee,
+      amountCharged: res.amountCharged,
+      depositRefund: res.depositRefund,
+      invoiceId: res.invoiceId,
+    };
+  } catch (err: any) {
+    throw new HttpsError("failed-precondition", err.message || "Lỗi khi đóng phiên đỗ.");
+  }
 });
 
+/**
+ * Callable adminAdjustBalance: Quản trị viên cộng / trừ tiền ví người dùng.
+ */
 export const adminAdjustBalance = onCall({ region: REGION }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Vui lòng đăng nhập quyền quản trị.");
-  }
+  assertAdmin(request);
+
   const { targetUid, deltaAmount, reason } = request.data || {};
 
   const delta = Number(deltaAmount);
   if (!targetUid || isNaN(delta) || delta === 0) {
-    throw new HttpsError("invalid-argument", "Thiếu targetUid hoặc số tiền điều chỉnh không hợp lệ.");
+    throw new HttpsError(
+      "invalid-argument",
+      "Thiếu targetUid hoặc số tiền điều chỉnh không hợp lệ."
+    );
   }
 
   const db = admin.firestore();
@@ -245,10 +221,13 @@ export const adminAdjustBalance = onCall({ region: REGION }, async (request) => 
   };
 });
 
+/**
+ * Callable adminRefundDeposit: Quản trị viên duyệt hoàn tiền cọc đặt chỗ bị mất.
+ * Fix B5: Chống hoàn tiền 2 lần (chỉ hoàn khi depositStatus === 'forfeited').
+ */
 export const adminRefundDeposit = onCall({ region: REGION }, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Vui lòng đăng nhập quyền quản trị.");
-  }
+  assertAdmin(request);
+
   const { reservationId, reason } = request.data || {};
 
   if (!reservationId) {
@@ -267,6 +246,15 @@ export const adminRefundDeposit = onCall({ region: REGION }, async (request) => 
       throw new HttpsError("not-found", "Không tìm thấy lượt đặt chỗ.");
     }
     const data = resDoc.data();
+
+    // Fix B5: Chống hoàn cọc 2 lần
+    if (data?.depositStatus !== "forfeited") {
+      throw new HttpsError(
+        "failed-precondition",
+        `Không thể hoàn cọc vì trạng thái cọc hiện tại là '${data?.depositStatus}' (chỉ hoàn khi 'forfeited').`
+      );
+    }
+
     const uid = data?.uid;
     const depositAmount = Number(data?.depositAmount || 5000);
 
@@ -298,4 +286,3 @@ export const adminRefundDeposit = onCall({ region: REGION }, async (request) => 
     transactionId: txRef.id,
   };
 });
-

@@ -1,8 +1,21 @@
 import * as admin from "firebase-admin";
 import { FcmService } from "../src/services/fcmService";
 
+const projectId =
+  process.env.GCLOUD_PROJECT ||
+  process.env.FIREBASE_PROJECT ||
+  "demo-iot-parking-smart";
+
+process.env.GCLOUD_PROJECT = projectId;
+
+if (!process.env.FIRESTORE_EMULATOR_HOST) {
+  process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:8080";
+}
+
 if (!admin.apps.length) {
-  admin.initializeApp();
+  admin.initializeApp({
+    projectId,
+  });
 }
 
 async function testPush() {

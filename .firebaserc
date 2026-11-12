@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "iot-parking-smart",
+    "demo": "demo-iot-parking-smart"
+  }
+}
+

@@ -1,7 +1,24 @@
 import * as admin from "firebase-admin";
 
+const projectId =
+  process.env.GCLOUD_PROJECT ||
+  process.env.FIREBASE_PROJECT ||
+  "demo-iot-parking-smart";
+
+process.env.GCLOUD_PROJECT = projectId;
+
+// Tự động kết nối Emulator nếu chưa cấu hình biến môi trường
+if (!process.env.FIRESTORE_EMULATOR_HOST) {
+  process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:8080";
+}
+if (!process.env.FIREBASE_AUTH_EMULATOR_HOST) {
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
+}
+
 if (!admin.apps.length) {
-  admin.initializeApp();
+  admin.initializeApp({
+    projectId,
+  });
 }
 
 const db = admin.firestore();
@@ -19,7 +36,7 @@ async function seedData() {
       "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=800&q=80",
     ],
     isLive: true,
-    deviceId: "ESP32_STATION_01",
+    deviceId: "ESP32_PARKING_01",
     deviceOnline: true,
     totalSlots: 4,
     availableSlots: 4,
@@ -187,6 +204,34 @@ async function seedData() {
     });
   }
   console.log("✅ Đã tạo 6 bãi mock vệ tinh thành công.");
+
+  // 3. Tạo tài khoản Admin mẫu và cấp claim admin: true
+  try {
+    const adminEmail = "admin@iotparking.com";
+    let adminUser: admin.auth.UserRecord;
+    try {
+      adminUser = await admin.auth().getUserByEmail(adminEmail);
+    } catch {
+      adminUser = await admin.auth().createUser({
+        email: adminEmail,
+        password: "AdminPassword123!",
+        displayName: "Ban Quản Trị Bãi Đỗ",
+      });
+    }
+    await admin.auth().setCustomUserClaims(adminUser.uid, { admin: true });
+    await db.collection("users").doc(adminUser.uid).set(
+      {
+        email: adminEmail,
+        displayName: "Ban Quản Trị Bãi Đỗ",
+        walletBalance: 1000000,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    console.log(`✅ Đã tạo/cập nhật tài khoản Admin mẫu: ${adminEmail} (Mật khẩu: AdminPassword123!, claim admin: true)`);
+  } catch (err: any) {
+    console.log("ℹ️ Bỏ qua tạo tài khoản Auth seed:", err.message);
+  }
 
   console.log("🎉 Hoàn tất nạp Seed Data!");
 }
