@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { Timestamp } from "firebase-admin/firestore";
 import { REGION } from "../config";
 
 export const extendPlannedDuration = onCall({ region: REGION }, async (request) => {
@@ -35,7 +36,7 @@ export const extendPlannedDuration = onCall({ region: REGION }, async (request) 
   const newPlannedEndMs = currentPlannedEndMs + minutesToAdd * 60 * 1000;
 
   await sessionRef.update({
-    plannedEndTime: admin.firestore.Timestamp.fromMillis(newPlannedEndMs),
+    plannedEndTime: Timestamp.fromMillis(newPlannedEndMs),
     remindedLongParking: false, // Để nhắc lại khi sắp đến mốc mới
   });
 

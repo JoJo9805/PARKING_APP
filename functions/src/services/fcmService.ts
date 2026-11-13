@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
 export interface FcmPayloadData {
   type:
@@ -47,7 +48,7 @@ export class FcmService {
           body: inboxRecord.body,
           refId: inboxRecord.refId || "",
           read: false,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp(),
         });
     }
 
@@ -83,7 +84,7 @@ export class FcmService {
         .collection("users")
         .doc(uid)
         .update({
-          fcmTokens: admin.firestore.FieldValue.arrayRemove(...deadTokens),
+          fcmTokens: FieldValue.arrayRemove(...deadTokens),
         });
     }
   }

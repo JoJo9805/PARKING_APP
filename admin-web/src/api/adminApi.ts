@@ -4,6 +4,8 @@ import {
   callAdminCloseSession,
   callAdminAdjustBalance,
   callAdminRefundDeposit,
+  callAdminCreateReservation,
+  callAdminCancelReservation,
 } from "../firebase";
 
 function formatError(err: any): Error {
@@ -25,17 +27,17 @@ function formatError(err: any): Error {
     } else {
       message = err.message || "Điều kiện thực hiện không hợp lệ.";
     }
-  } else if (code === "invalid-argument") {
-    message = err.message || "Tham số gửi lên không đúng định dạng.";
+  } else if (code === "invalid-argument" || code === "resource-exhausted" || code === "already-exists") {
+    message = err.message || "Dữ liệu không hợp lệ hoặc không đủ tài nguyên.";
   }
 
   return new Error(message);
 }
 
 export const adminApi = {
-  async openGate(deviceId?: string, direction?: "in" | "out") {
+  async openGate(deviceId?: string, direction?: "in" | "out", action: "OPEN_GATE" | "CLOSE_GATE" = "OPEN_GATE") {
     try {
-      const res = await callAdminOpenGate({ deviceId, direction });
+      const res = await callAdminOpenGate({ deviceId, direction, action });
       return res.data;
     } catch (err) {
       throw formatError(err);
@@ -77,6 +79,29 @@ export const adminApi = {
   async refundDeposit(reservationId: string, reason?: string) {
     try {
       const res = await callAdminRefundDeposit({ reservationId, reason });
+      return res.data;
+    } catch (err) {
+      throw formatError(err);
+    }
+  },
+
+  async createReservation(params: {
+    plateDisplay: string;
+    lotId?: string;
+    slotId?: string;
+    holdMinutes?: number;
+  }) {
+    try {
+      const res = await callAdminCreateReservation(params);
+      return res.data;
+    } catch (err) {
+      throw formatError(err);
+    }
+  },
+
+  async cancelReservation(reservationId: string, reason?: string) {
+    try {
+      const res = await callAdminCancelReservation({ reservationId, reason });
       return res.data;
     } catch (err) {
       throw formatError(err);

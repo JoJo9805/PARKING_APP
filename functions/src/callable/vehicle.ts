@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 import { PlateUtils } from "../domain/plateUtils";
 
@@ -36,7 +37,7 @@ export const addVehicle = onCall({ region: REGION }, async (request) => {
     plateDisplay: formattedDisplay,
     type: vehicleType,
     nickname: nickname ? String(nickname).trim() : "",
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 
   if (setDefault === true) {

@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 import { FcmService } from "../services/fcmService";
 
@@ -42,7 +43,7 @@ export const topUpWallet = onCall({ region: REGION }, async (request) => {
       methodLabel: methodId ? `Thẻ (${methodId})` : "Thẻ ngân hàng giả lập",
       invoiceNo: `TOP-${Date.now().toString().slice(-8)}`,
       description: `Nạp ${numAmount.toLocaleString("vi-VN")}đ vào ví nội bộ`,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
   });
 

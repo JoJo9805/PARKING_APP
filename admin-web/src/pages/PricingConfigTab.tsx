@@ -11,8 +11,8 @@ interface Props {
 }
 
 export function PricingConfigTab({ lot, isLoading, onUpdate, onSuccess, onError }: Props) {
-  const [pricePerBlock, setPricePerBlock] = useState(5000);
-  const [blockMinutes, setBlockMinutes] = useState(30);
+  const [pricePerBlock, setPricePerBlock] = useState(20000);
+  const [blockMinutes, setBlockMinutes] = useState(60);
   const [graceMinutes, setGraceMinutes] = useState(0);
   const [depositAmount, setDepositAmount] = useState(5000);
   const [freeCancelMinutes, setFreeCancelMinutes] = useState(2);
@@ -25,8 +25,8 @@ export function PricingConfigTab({ lot, isLoading, onUpdate, onSuccess, onError 
 
   useEffect(() => {
     if (lot) {
-      setPricePerBlock(lot.pricePerBlock ?? 5000);
-      setBlockMinutes(lot.blockMinutes ?? 30);
+      setPricePerBlock(lot.pricePerBlock ?? 20000);
+      setBlockMinutes(lot.blockMinutes ?? 60);
       setGraceMinutes(lot.graceMinutes ?? 0);
       setDepositAmount(lot.depositAmount ?? 5000);
       setFreeCancelMinutes(lot.freeCancelMinutes ?? 2);
@@ -37,10 +37,10 @@ export function PricingConfigTab({ lot, isLoading, onUpdate, onSuccess, onError 
   // Tính nhẩm công thức chuẩn v1.1
   const calcPreview = () => {
     let fee = 0;
-    if (testDuration <= graceMinutes) {
+    if (graceMinutes > 0 && testDuration <= graceMinutes) {
       fee = 0;
     } else {
-      const billable = testDuration - graceMinutes;
+      const billable = Math.max(1, testDuration - graceMinutes);
       const blocks = Math.ceil(billable / blockMinutes);
       fee = blocks * pricePerBlock;
     }
@@ -250,7 +250,10 @@ export function PricingConfigTab({ lot, isLoading, onUpdate, onSuccess, onError 
               <div className="flex justify-between">
                 <span className="text-slate-600">Số block tính phí:</span>
                 <span className="font-bold font-mono">
-                  {testDuration <= graceMinutes ? 0 : Math.ceil((testDuration - graceMinutes) / blockMinutes)} block
+                  {graceMinutes > 0 && testDuration <= graceMinutes
+                    ? 0
+                    : Math.ceil(Math.max(1, testDuration - graceMinutes) / blockMinutes)}{" "}
+                  block
                 </span>
               </div>
               <div className="flex justify-between">

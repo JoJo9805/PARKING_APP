@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { BUSINESS_CONFIG } from "../config";
 import { PlateUtils } from "./plateUtils";
 import { FeeCalculator, FeeCalculationResult } from "./feeCalculator";
@@ -64,13 +65,13 @@ export class SessionService {
       if (resDoc.exists) {
         const resData = resDoc.data() || {};
         assignedSlotId = resData.slotId || assignedSlotId;
-        depositApplied = Number(resData.depositAmount || BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT);
+        depositApplied = Number(resData.depositAmount ?? BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT);
         sessionUid = resData.uid || null;
 
         await resDoc.ref.update({
           status: "fulfilled",
-          depositStatus: "applied",
-          fulfilledAt: admin.firestore.FieldValue.serverTimestamp(),
+          depositStatus: depositApplied > 0 ? "applied" : (resData.depositStatus || "none"),
+          fulfilledAt: FieldValue.serverTimestamp(),
         });
       }
     } else {
@@ -86,36 +87,22 @@ export class SessionService {
         const resData = resDoc.data();
         matchedReservationId = resDoc.id;
         assignedSlotId = resData.slotId;
-        depositApplied = Number(resData.depositAmount || BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT);
+        depositApplied = Number(resData.depositAmount ?? BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT);
         sessionUid = resData.uid || null;
 
         await resDoc.ref.update({
           status: "fulfilled",
-          depositStatus: "applied",
-          fulfilledAt: admin.firestore.FieldValue.serverTimestamp(),
+          depositStatus: depositApplied > 0 ? "applied" : (resData.depositStatus || "none"),
+          fulfilledAt: FieldValue.serverTimestamp(),
         });
       }
     }
 
-    // 2. Nếu vào tự do: tìm chủ xe trong vehicles và tìm slot trống
+    // 2. Nếu vào tự do: tìm chủ xe trong vehicles (tạm tắt tự gán ô khi xe vào)
     if (!matchedReservationId) {
       const vehicleDoc = await db.collection("vehicles").doc(plateNormalized).get();
       if (vehicleDoc.exists) {
         sessionUid = vehicleDoc.data()?.ownerUid || null;
-      }
-
-      if (!assignedSlotId) {
-        const freeSlots = await lotRef
-          .collection("slots")
-          .where("status", "==", "available")
-          .limit(1)
-          .get();
-
-        if (!freeSlots.empty) {
-          assignedSlotId = freeSlots.docs[0].id;
-        } else {
-          assignedSlotId = "A1"; // Fallback nếu chưa cấu hình slot
-        }
       }
     }
 
@@ -144,8 +131,8 @@ export class SessionService {
       actualSlotId: assignedSlotId,
       reservationId: matchedReservationId,
       status: "active",
-      entryTime: admin.firestore.Timestamp.fromMillis(nowMs),
-      plannedEndTime: admin.firestore.Timestamp.fromMillis(plannedEndMs),
+      entryTime: Timestamp.fromMillis(nowMs),
+      plannedEndTime: Timestamp.fromMillis(plannedEndMs),
       remindedLongParking: false,
       durationMin: 0,
       fee: 0,
@@ -155,10 +142,10 @@ export class SessionService {
       entryImageUrl: params.imageUrl || "",
       exitImageUrl: "",
       flags: [],
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
-    // 5. Cập nhật slot sang occupied
+    // 5. Cập nhật slot sang occupied (xóa reservationId nếu vừa vào từ đặt chỗ)
     if (assignedSlotId) {
       await lotRef
         .collection("slots")
@@ -167,8 +154,8 @@ export class SessionService {
           {
             status: "occupied",
             sessionId: sessionRef.id,
-            sensorOccupied: true,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            reservationId: null,
+            updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true }
         );
@@ -307,7 +294,7 @@ export class SessionService {
               description: params.closedByAdmin
                 ? `Quản trị viên đóng phiên đỗ ${resultDurationMin} phút tại ${lotName}`
                 : `Thanh toán phí đỗ xe ${resultDurationMin} phút tại ${lotName}`,
-              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              createdAt: FieldValue.serverTimestamp(),
             });
           }
 
@@ -323,7 +310,7 @@ export class SessionService {
               methodLabel: "Hoàn cọc dư ví",
               invoiceNo: `EXC-${sessionRef.id.slice(-6).toUpperCase()}`,
               description: `Hoàn phần tiền cọc dư (${resultDepositRefund.toLocaleString("vi-VN")}đ) phiên đỗ ${lotName}`,
-              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              createdAt: FieldValue.serverTimestamp(),
             });
           }
         }
@@ -332,7 +319,7 @@ export class SessionService {
       // Cập nhật session
       transaction.update(sessionRef, {
         status: "completed",
-        exitTime: admin.firestore.Timestamp.fromMillis(effectiveExitMs),
+        exitTime: Timestamp.fromMillis(effectiveExitMs),
         durationMin: resultDurationMin,
         fee: resultFee,
         depositRefund: resultDepositRefund,
@@ -352,7 +339,7 @@ export class SessionService {
             sessionId: null,
             reservationId: null,
             sensorOccupied: false,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true }
         );

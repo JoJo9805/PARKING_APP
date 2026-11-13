@@ -41,7 +41,7 @@ export const callAdminCorrectPlate = httpsCallable<
 >(functions, "adminCorrectPlate");
 
 export const callAdminOpenGate = httpsCallable<
-  { deviceId?: string; direction?: "in" | "out" },
+  { deviceId?: string; direction?: "in" | "out"; action?: "OPEN_GATE" | "CLOSE_GATE" },
   { commandId: string }
 >(functions, "adminOpenGate");
 
@@ -59,3 +59,13 @@ export const callAdminRefundDeposit = httpsCallable<
   { reservationId: string; reason?: string },
   { balanceAfter: number; transactionId: string }
 >(functions, "adminRefundDeposit");
+
+export const callAdminCreateReservation = httpsCallable<
+  { plateDisplay: string; lotId?: string; slotId?: string; holdMinutes?: number },
+  { reservationId: string; slotId: string; plate: string; plateDisplay: string; expiresAtMs: number }
+>(functions, "adminCreateReservation");
+
+export const callAdminCancelReservation = httpsCallable<
+  { reservationId: string; reason?: string },
+  { reservationId: string; slotId: string; refundedAmount: number }
+>(functions, "adminCancelReservation");

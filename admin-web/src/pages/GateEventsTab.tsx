@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { GateEvent } from "../types";
-import { Camera, Check, Edit3, Filter, Image, Search, XCircle } from "lucide-react";
+import { Camera, Edit3, Search } from "lucide-react";
 import { ImageLightbox } from "../components/CommonModals";
 import { adminApi } from "../api/adminApi";
 
@@ -13,7 +13,6 @@ interface Props {
 
 export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) {
   const [filterDirection, setFilterDirection] = useState<"all" | "in" | "out">("all");
-  const [filterDecision, setFilterDecision] = useState<"all" | "accepted" | "denied">("all");
   const [searchPlate, setSearchPlate] = useState("");
 
   // Lightbox xem ảnh
@@ -27,7 +26,6 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
   const filteredEvents = events.filter((ev) => {
     const dir = (ev.direction || "").toLowerCase();
     if (filterDirection !== "all" && dir !== filterDirection) return false;
-    if (filterDecision !== "all" && ev.decision !== filterDecision) return false;
     if (searchPlate) {
       const q = searchPlate.toUpperCase().replace(/[^A-Z0-9]/g, "");
       const plate = (ev.plateNormalized || ev.plateRaw || "").toUpperCase();
@@ -98,16 +96,6 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
             <option value="in">Cổng VÀO (IN)</option>
             <option value="out">Cổng RA (OUT)</option>
           </select>
-
-          <select
-            value={filterDecision}
-            onChange={(e) => setFilterDecision(e.target.value as any)}
-            className="bg-slate-50 border border-slate-200 rounded-lg text-xs py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-slate-700"
-          >
-            <option value="all">Tất cả quyết định</option>
-            <option value="accepted">Hợp lệ (Accepted)</option>
-            <option value="denied">Từ chối (Denied)</option>
-          </select>
         </div>
       </div>
 
@@ -122,7 +110,6 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
               <th className="py-3.5 px-4">Độ Tin Cậy</th>
               <th className="py-3.5 px-4">Ô Gán</th>
               <th className="py-3.5 px-4">Độ Trễ</th>
-              <th className="py-3.5 px-4">Quyết Định</th>
               <th className="py-3.5 px-4">Ảnh Chụp</th>
               <th className="py-3.5 px-4">Thời Gian</th>
               <th className="py-3.5 px-4">Hành Động</th>
@@ -131,14 +118,13 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
           <tbody className="divide-y divide-slate-100 font-medium">
             {filteredEvents.length === 0 ? (
               <tr>
-                <td colSpan={10} className="py-8 text-center text-slate-400">
+                <td colSpan={9} className="py-8 text-center text-slate-400">
                   Chưa có sự kiện cổng nào được ghi nhận.
                 </td>
               </tr>
             ) : (
               filteredEvents.map((evt) => {
                 const dir = (evt.direction || "in").toLowerCase();
-                const isAccepted = evt.decision === "accepted";
                 const timeStr = evt.serverTs?.toDate
                   ? evt.serverTs.toDate().toLocaleTimeString("vi-VN")
                   : "-";
@@ -177,18 +163,6 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
                     </td>
                     <td className="py-3 px-4 text-slate-500 font-mono">
                       {evt.latencyMs ? `${evt.latencyMs.toFixed(0)}ms` : "-"}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                          isAccepted
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-rose-100 text-rose-800"
-                        }`}
-                      >
-                        {isAccepted ? <Check className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
-                        <span>{isAccepted ? "Hợp lệ" : "Từ chối"}</span>
-                      </span>
                     </td>
                     <td className="py-3 px-4">
                       {evt.imageUrl || evt.cropImageUrl ? (

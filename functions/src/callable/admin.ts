@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { REGION, BUSINESS_CONFIG } from "../config";
 import { PlateUtils } from "../domain/plateUtils";
 import { SessionService } from "../domain/sessionService";
@@ -89,9 +90,9 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
     plateDisplay: PlateUtils.formatDisplay(normalized),
     isManualCorrected: true,
     correctedBy: request.auth?.uid,
-    correctedAt: admin.firestore.FieldValue.serverTimestamp(),
+    correctedAt: FieldValue.serverTimestamp(),
     decision: "accepted",
-    sessionId: sessionId || admin.firestore.FieldValue.delete(),
+    sessionId: sessionId || FieldValue.delete(),
     status: "processed",
   });
 
@@ -108,7 +109,8 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
 export const adminOpenGate = onCall({ region: REGION }, async (request) => {
   assertAdmin(request);
 
-  let { deviceId, direction } = request.data || {};
+  let { deviceId, direction, action } = request.data || {};
+  const gateAction = action === "CLOSE_GATE" ? "CLOSE_GATE" : "OPEN_GATE";
   const db = admin.firestore();
 
   // Fix B2: Nếu không truyền deviceId, tự tra cứu từ lot_live_01 hoặc dùng default
@@ -123,17 +125,16 @@ export const adminOpenGate = onCall({ region: REGION }, async (request) => {
 
   const cmdRef = db.collection("deviceCommands").doc();
 
-  // Fix B1: Edge Server nhận diện action "OPEN_GATE"
   await cmdRef.set({
     deviceId,
-    action: "OPEN_GATE",
+    action: gateAction,
     payload: {
       direction: direction || "in",
-      reason: "admin_manual_open",
+      reason: gateAction === "CLOSE_GATE" ? "admin_manual_close" : "admin_manual_open",
     },
     status: "pending",
     createdBy: request.auth?.uid,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 
   return { commandId: cmdRef.id };
@@ -211,7 +212,7 @@ export const adminAdjustBalance = onCall({ region: REGION }, async (request) => 
       balanceAfter: finalBalance,
       invoiceNo: `ADJ-${Date.now().toString().slice(-8)}`,
       description: reason || "Quản trị viên điều chỉnh số dư",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
   });
 
@@ -277,12 +278,251 @@ export const adminRefundDeposit = onCall({ region: REGION }, async (request) => 
       balanceAfter: finalBalance,
       reservationId,
       description: reason || "Quản trị viên duyệt hoàn cọc đặt chỗ",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
   });
 
   return {
     balanceAfter: finalBalance,
     transactionId: txRef.id,
+  };
+});
+
+/**
+ * Callable adminCreateReservation: Quản trị viên nhập biển số đặt chỗ trên Web Admin,
+ * hệ thống tự động gán ô trống khả dụng (hoặc theo ô chỉ định) và khóa ô sang reserved.
+ */
+export const adminCreateReservation = onCall({ region: REGION }, async (request) => {
+  assertAdmin(request);
+
+  const { plateDisplay, lotId, slotId, holdMinutes } = request.data || {};
+  if (!plateDisplay || typeof plateDisplay !== "string") {
+    throw new HttpsError("invalid-argument", "Vui lòng nhập biển số xe.");
+  }
+
+  const normalized = PlateUtils.normalize(plateDisplay);
+  if (!PlateUtils.isValid(normalized)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Biển số xe không đúng định dạng Việt Nam (VD: 30A-123.45 hoặc 18Y-444.44)."
+    );
+  }
+
+  const targetLotId = (lotId && String(lotId).trim()) || BUSINESS_CONFIG.DEFAULT_LOT_ID;
+  const requestedSlotId = slotId ? String(slotId).trim() : "";
+  const durationMinutes = Number(holdMinutes ?? BUSINESS_CONFIG.HOLD_DURATION_MINUTES);
+  if (!Number.isFinite(durationMinutes) || durationMinutes < 1 || durationMinutes > 1440) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Thời gian giữ chỗ phải từ 1 đến 1440 phút."
+    );
+  }
+
+  const db = admin.firestore();
+  const lotRef = db.collection("lots").doc(targetLotId);
+
+  // Tìm chủ xe (nếu biển số đã đăng ký trong hệ thống) để liên kết hiển thị
+  let linkedUid: string | null = null;
+  const vehicleDoc = await db.collection("vehicles").doc(normalized).get();
+  if (vehicleDoc.exists) {
+    linkedUid = vehicleDoc.data()?.ownerUid || null;
+  }
+
+  const formattedDisplay = PlateUtils.formatDisplay(normalized);
+  const resRef = db.collection("reservations").doc();
+  const nowMs = Date.now();
+  const expiresAtMs = nowMs + durationMinutes * 60 * 1000;
+  let assignedSlotId = "";
+
+  await db.runTransaction(async (transaction) => {
+    const lotDoc = await transaction.get(lotRef);
+    if (!lotDoc.exists) {
+      throw new HttpsError("not-found", `Không tìm thấy bãi đỗ ${targetLotId}.`);
+    }
+    const lotName = lotDoc.data()?.name || "Bãi Live ESP32";
+
+    // Chống trùng giữ chỗ hoặc xe đang đỗ active
+    const dupResQuery = db
+      .collection("reservations")
+      .where("plate", "==", normalized)
+      .where("status", "==", "active")
+      .limit(1);
+    const dupResSnap = await transaction.get(dupResQuery);
+    if (!dupResSnap.empty) {
+      const existingSlot = dupResSnap.docs[0].data()?.slotId || "";
+      throw new HttpsError(
+        "failed-precondition",
+        `Biển số ${formattedDisplay} đang có lượt giữ chỗ hoạt động tại ô ${existingSlot}.`
+      );
+    }
+
+    const activeSessQuery = db
+      .collection("sessions")
+      .where("plate", "==", normalized)
+      .where("status", "==", "active")
+      .limit(1);
+    const activeSessSnap = await transaction.get(activeSessQuery);
+    if (!activeSessSnap.empty) {
+      throw new HttpsError(
+        "failed-precondition",
+        `Xe biển số ${formattedDisplay} hiện đang đỗ trong bãi.`
+      );
+    }
+
+    let chosenSlotRef: FirebaseFirestore.DocumentReference | null = null;
+
+    if (requestedSlotId) {
+      const candidateRef = lotRef.collection("slots").doc(requestedSlotId);
+      const slotDoc = await transaction.get(candidateRef);
+      if (!slotDoc.exists) {
+        throw new HttpsError("not-found", `Không tìm thấy ô đỗ ${requestedSlotId}.`);
+      }
+      const sData = slotDoc.data() || {};
+      if (sData.status !== "available" || sData.sensorOccupied === true) {
+        throw new HttpsError(
+          "resource-exhausted",
+          `Ô ${requestedSlotId} hiện không còn trống (trạng thái: ${sData.status}).`
+        );
+      }
+      assignedSlotId = slotDoc.id;
+      chosenSlotRef = candidateRef;
+    } else {
+      const slotsSnap = await transaction.get(lotRef.collection("slots"));
+      const candidates = slotsSnap.docs
+        .map((d) => ({ ref: d.ref, id: d.id, data: d.data() || {} }))
+        .filter((s) => s.data.status === "available" && s.data.sensorOccupied !== true)
+        .sort((a, b) => a.id.localeCompare(b.id));
+
+      if (candidates.length === 0) {
+        throw new HttpsError(
+          "resource-exhausted",
+          "Tất cả ô đỗ hiện đều đã kín hoặc đang được giữ chỗ."
+        );
+      }
+      assignedSlotId = candidates[0].id;
+      chosenSlotRef = candidates[0].ref;
+    }
+
+    transaction.set(resRef, {
+      uid: linkedUid,
+      lotId: targetLotId,
+      lotName,
+      slotId: assignedSlotId,
+      plate: normalized,
+      plateDisplay: formattedDisplay,
+      status: "active",
+      createdBy: "admin",
+      createdByUid: request.auth?.uid || null,
+      createdAt: Timestamp.fromMillis(nowMs),
+      expiresAt: Timestamp.fromMillis(expiresAtMs),
+      remindedExpiring: false,
+      extendCount: 0,
+      maxExtendCount: 0,
+      depositAmount: 0,
+      depositStatus: "none",
+    });
+
+    transaction.update(chosenSlotRef, {
+      status: "reserved",
+      reservationId: resRef.id,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  });
+
+  return {
+    reservationId: resRef.id,
+    slotId: assignedSlotId,
+    plate: normalized,
+    plateDisplay: formattedDisplay,
+    expiresAtMs,
+  };
+});
+
+/**
+ * Callable adminCancelReservation: Quản trị viên hủy lượt giữ chỗ đang active
+ * và giải phóng ô đỗ về available (hoàn cọc nếu lượt đặt từ App có giữ cọc).
+ */
+export const adminCancelReservation = onCall({ region: REGION }, async (request) => {
+  assertAdmin(request);
+
+  const { reservationId, reason } = request.data || {};
+  if (!reservationId) {
+    throw new HttpsError("invalid-argument", "Thiếu reservationId.");
+  }
+
+  const db = admin.firestore();
+  const resRef = db.collection("reservations").doc(reservationId);
+  let freedSlotId = "";
+  let refundedAmount = 0;
+
+  await db.runTransaction(async (transaction) => {
+    const resDoc = await transaction.get(resRef);
+    if (!resDoc.exists) {
+      throw new HttpsError("not-found", "Không tìm thấy lượt đặt chỗ.");
+    }
+    const data = resDoc.data() || {};
+    if (data.status !== "active") {
+      throw new HttpsError(
+        "failed-precondition",
+        `Chỉ có thể hủy lượt đặt chỗ đang giữ (trạng thái hiện tại: ${data.status}).`
+      );
+    }
+
+    const uid = data.uid;
+    const depositAmount = Number(data.depositAmount || 0);
+    const shouldRefund = Boolean(uid && depositAmount > 0 && data.depositStatus === "held");
+
+    let newBalance = 0;
+    if (shouldRefund) {
+      const userRef = db.collection("users").doc(uid);
+      const userDoc = await transaction.get(userRef);
+      if (userDoc.exists) {
+        const currentBal = Number(userDoc.data()?.walletBalance || 0);
+        newBalance = currentBal + depositAmount;
+        transaction.update(userRef, { walletBalance: newBalance });
+
+        const txRef = db.collection("transactions").doc();
+        transaction.set(txRef, {
+          uid,
+          type: "deposit_refund",
+          amount: depositAmount,
+          balanceAfter: newBalance,
+          reservationId,
+          description: reason || "Quản trị viên hủy giữ chỗ & hoàn cọc",
+          createdAt: FieldValue.serverTimestamp(),
+        });
+        refundedAmount = depositAmount;
+      }
+    }
+
+    transaction.update(resRef, {
+      status: "cancelled",
+      ...(shouldRefund ? { depositStatus: "refunded" } : {}),
+      cancelReason: reason || "Quản trị viên hủy giữ chỗ trên Web",
+      cancelledAt: FieldValue.serverTimestamp(),
+    });
+
+    if (data.lotId && data.slotId) {
+      freedSlotId = data.slotId;
+      const slotRef = db
+        .collection("lots")
+        .doc(data.lotId)
+        .collection("slots")
+        .doc(data.slotId);
+      const slotDoc = await transaction.get(slotRef);
+      if (slotDoc.exists && slotDoc.data()?.status === "reserved") {
+        transaction.update(slotRef, {
+          status: "available",
+          reservationId: null,
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+      }
+    }
+  });
+
+  return {
+    reservationId,
+    slotId: freedSlotId,
+    refundedAmount,
   };
 });

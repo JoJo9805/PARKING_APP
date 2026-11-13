@@ -19,6 +19,8 @@ export {
   adminCloseSession,
   adminAdjustBalance,
   adminRefundDeposit,
+  adminCreateReservation,
+  adminCancelReservation,
 } from "./callable/admin";
 
 // 2. Firestore Triggers

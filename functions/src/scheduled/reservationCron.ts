@@ -1,5 +1,6 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 import { FcmService } from "../services/fcmService";
 
@@ -28,13 +29,14 @@ export const reservationCron = onSchedule(
       const maxExtendCount = Number(data.maxExtendCount || 1);
       const canExtend = extendCount < maxExtendCount;
 
-      // 1. Quá hạn 15 phút -> Hết hạn & Tịch thu cọc
+      // 1. Quá hạn giữ chỗ -> Hết hạn (tịch thu cọc nếu có giữ cọc)
       if (nowMs >= expiresAtMs) {
+        const hasHeldDeposit = Number(data.depositAmount || 0) > 0 && data.depositStatus === "held";
         await db.runTransaction(async (transaction) => {
           transaction.update(doc.ref, {
             status: "expired",
-            depositStatus: "forfeited",
-            expiredAt: admin.firestore.FieldValue.serverTimestamp(),
+            depositStatus: hasHeldDeposit ? "forfeited" : (data.depositStatus || "none"),
+            expiredAt: FieldValue.serverTimestamp(),
           });
 
           // Giải phóng ô đỗ
@@ -47,7 +49,7 @@ export const reservationCron = onSchedule(
             transaction.update(slotRef, {
               status: "available",
               reservationId: null,
-              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: FieldValue.serverTimestamp(),
             });
           }
         });

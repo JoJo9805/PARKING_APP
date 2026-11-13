@@ -5,9 +5,7 @@ import {
   Car,
   CalendarCheck,
   Settings,
-  Users,
   Cpu,
-  BarChart3,
   LogOut,
   Wifi,
   WifiOff,
@@ -23,7 +21,6 @@ import {
   useGateEvents,
   useSessions,
   useReservations,
-  useUsers,
   useDevices,
   useDeviceCommands,
   useTransactions,
@@ -33,9 +30,7 @@ import { GateEventsTab } from "./pages/GateEventsTab";
 import { SessionsTab } from "./pages/SessionsTab";
 import { ReservationsTab } from "./pages/ReservationsTab";
 import { PricingConfigTab } from "./pages/PricingConfigTab";
-import { UsersTab } from "./pages/UsersTab";
 import { DevicesTab } from "./pages/DevicesTab";
-import { AnalyticsTab } from "./pages/AnalyticsTab";
 
 type Tab =
   | "realtime"
@@ -43,9 +38,7 @@ type Tab =
   | "sessions"
   | "reservations"
   | "pricing"
-  | "users"
-  | "devices"
-  | "analytics";
+  | "devices";
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
@@ -63,12 +56,11 @@ function DashboardContent() {
   const { events, loading: loadingEvents } = useGateEvents("lot_live_01", 50);
   const { sessions, loading: loadingSessions } = useSessions(50);
   const { reservations, loading: loadingReservations } = useReservations(50);
-  const { users, loading: loadingUsers } = useUsers(50);
   const { devices, loading: loadingDevices } = useDevices();
   const { commands, loading: loadingCommands } = useDeviceCommands(20);
   const { transactions, loading: loadingTransactions } = useTransactions(100);
 
-  const isGateOnline = lot?.deviceOnline ?? true;
+  const isGateOnline = lot?.deviceOnline ?? false;
 
   return (
     <div className="flex h-screen bg-slate-50 font-sans antialiased text-slate-900">
@@ -93,9 +85,7 @@ function DashboardContent() {
             { id: "sessions", label: "3. Quản lý Phiên đỗ", icon: Car },
             { id: "reservations", label: "4. Đặt chỗ & Cọc", icon: CalendarCheck },
             { id: "pricing", label: "5. Cấu hình Bãi & Giá", icon: Settings },
-            { id: "users", label: "6. Người dùng & Ví", icon: Users },
-            { id: "devices", label: "7. Điều khiển Thiết bị", icon: Cpu },
-            { id: "analytics", label: "8. Báo cáo Thống kê", icon: BarChart3 },
+            { id: "devices", label: "6. Điều khiển Thiết bị", icon: Cpu },
           ].map((item) => {
             const Icon = item.icon;
             const active = activeTab === item.id;
@@ -124,8 +114,8 @@ function DashboardContent() {
           </div>
           <div className="flex items-center justify-between">
             <span>Thiết bị:</span>
-            <span className="flex items-center text-emerald-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1.5"></span>
+            <span className={`flex items-center font-medium ${isGateOnline ? "text-emerald-400" : "text-rose-400"}`}>
+              <span className={`w-2 h-2 rounded-full inline-block mr-1.5 ${isGateOnline ? "bg-emerald-500" : "bg-rose-500"}`}></span>
               ESP32_PARKING_01
             </span>
           </div>
@@ -143,9 +133,7 @@ function DashboardContent() {
               {activeTab === "sessions" && "Phân hệ 3: Quản Lý Phiên Đỗ Xe"}
               {activeTab === "reservations" && "Phân hệ 4: Quản Lý Đặt Chỗ & Đối Trừ Cọc"}
               {activeTab === "pricing" && "Phân hệ 5: Cấu Hình Bãi Đỗ & Bảng Giá Block"}
-              {activeTab === "users" && "Phân hệ 6: Quản Lý Người Dùng & Điều Chỉnh Ví"}
-              {activeTab === "devices" && "Phân hệ 7: Điều Khiển & Giám Sát Thiết Bị IoT"}
-              {activeTab === "analytics" && "Phân hệ 8: Báo Cáo Thống Kê Doanh Thu & OCR"}
+              {activeTab === "devices" && "Phân hệ 6: Điều Khiển & Giám Sát Thiết Bị IoT"}
             </h2>
           </div>
 
@@ -241,6 +229,8 @@ function DashboardContent() {
           {activeTab === "reservations" && (
             <ReservationsTab
               reservations={reservations}
+              lot={lot}
+              slots={slots}
               isLoading={loadingReservations}
               onSuccess={showSuccess}
               onError={showError}
@@ -257,15 +247,6 @@ function DashboardContent() {
             />
           )}
 
-          {activeTab === "users" && (
-            <UsersTab
-              users={users}
-              isLoading={loadingUsers}
-              onSuccess={showSuccess}
-              onError={showError}
-            />
-          )}
-
           {activeTab === "devices" && (
             <DevicesTab
               lot={lot}
@@ -274,16 +255,6 @@ function DashboardContent() {
               isLoading={loadingCommands}
               onSuccess={showSuccess}
               onError={showError}
-            />
-          )}
-
-          {activeTab === "analytics" && (
-            <AnalyticsTab
-              transactions={transactions}
-              reservations={reservations}
-              events={events}
-              sessions={sessions}
-              isLoading={loadingTransactions || loadingEvents}
             />
           )}
         </div>

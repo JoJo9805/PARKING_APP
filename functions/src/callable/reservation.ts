@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { REGION, BUSINESS_CONFIG } from "../config";
 import { PlateUtils } from "../domain/plateUtils";
 
@@ -138,7 +139,7 @@ export const createReservation = onCall({ region: REGION }, async (request) => {
       methodLabel: "Ví nội bộ",
       invoiceNo: `DEP-${Date.now().toString().slice(-8)}`,
       description: `Đặt cọc giữ chỗ ô ${targetSlotId} tại ${lotName}`,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     // Tạo reservation
@@ -150,8 +151,8 @@ export const createReservation = onCall({ region: REGION }, async (request) => {
       plate: plateNormalized,
       plateDisplay: PlateUtils.formatDisplay(plateNormalized),
       status: "active",
-      createdAt: admin.firestore.Timestamp.fromMillis(nowMs),
-      expiresAt: admin.firestore.Timestamp.fromMillis(expiresAtMs),
+      createdAt: Timestamp.fromMillis(nowMs),
+      expiresAt: Timestamp.fromMillis(expiresAtMs),
       remindedExpiring: false,
       extendCount: 0,
       maxExtendCount: BUSINESS_CONFIG.MAX_EXTEND_COUNT,
@@ -163,7 +164,7 @@ export const createReservation = onCall({ region: REGION }, async (request) => {
     transaction.update(slotRef, {
       status: "reserved",
       reservationId: resRef.id,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
   });
 
@@ -246,13 +247,13 @@ export const cancelReservation = onCall({ region: REGION }, async (request) => {
         methodLabel: "Hoàn cọc ví",
         invoiceNo: `REF-${Date.now().toString().slice(-8)}`,
         description: `Hoàn cọc huỷ đặt chỗ trước 2 phút (${resData.lotName})`,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       });
 
       transaction.update(resRef, {
         status: "cancelled",
         depositStatus: "refunded",
-        cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+        cancelledAt: FieldValue.serverTimestamp(),
       });
     } else {
       // Huỷ sau 2 phút -> Mất cọc
@@ -263,7 +264,7 @@ export const cancelReservation = onCall({ region: REGION }, async (request) => {
       transaction.update(resRef, {
         status: "cancelled",
         depositStatus: "forfeited",
-        cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+        cancelledAt: FieldValue.serverTimestamp(),
       });
     }
 
@@ -271,7 +272,7 @@ export const cancelReservation = onCall({ region: REGION }, async (request) => {
     transaction.update(slotRef, {
       status: "available",
       reservationId: null,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
   });
 
@@ -327,7 +328,7 @@ export const extendReservation = onCall({ region: REGION }, async (request) => {
     newExtendCount = extendCount + 1;
 
     transaction.update(resRef, {
-      expiresAt: admin.firestore.Timestamp.fromMillis(newExpiresAtMs),
+      expiresAt: Timestamp.fromMillis(newExpiresAtMs),
       extendCount: newExtendCount,
       remindedExpiring: false, // Reset để nhắc lại ở 5 phút cuối mới
     });

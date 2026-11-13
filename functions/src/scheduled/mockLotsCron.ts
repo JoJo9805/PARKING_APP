@@ -1,5 +1,6 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 
 export const mockLotsCron = onSchedule(
@@ -26,7 +27,7 @@ export const mockLotsCron = onSchedule(
 
       await doc.ref.update({
         availableSlots: newAvailable,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       });
     }
   }

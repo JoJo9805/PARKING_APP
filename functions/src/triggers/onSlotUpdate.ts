@@ -1,5 +1,6 @@
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 
 export const onSlotUpdated = onDocumentWritten(
@@ -29,7 +30,7 @@ export const onSlotUpdated = onDocumentWritten(
     await lotRef.update({
       availableSlots,
       ...(totalSlots > 0 ? { totalSlots } : {}),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
   }
 );

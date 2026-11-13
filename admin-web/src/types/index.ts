@@ -5,6 +5,7 @@ export interface Lot {
   deviceId?: string;
   deviceOnline?: boolean;
   camOnline?: boolean;
+  barrierOpen?: boolean;
   totalSlots: number;
   availableSlots: number;
   pricePerBlock: number;
@@ -80,7 +81,7 @@ export interface Session {
 
 export interface Reservation {
   id: string;
-  uid: string;
+  uid?: string | null;
   lotId: string;
   lotName: string;
   slotId: string;
@@ -92,7 +93,8 @@ export interface Reservation {
   extendCount?: number;
   maxExtendCount?: number;
   depositAmount: number;
-  depositStatus: "held" | "applied" | "refunded" | "forfeited";
+  depositStatus: "held" | "applied" | "refunded" | "forfeited" | "none";
+  createdBy?: "user" | "admin";
 }
 
 export interface Transaction {

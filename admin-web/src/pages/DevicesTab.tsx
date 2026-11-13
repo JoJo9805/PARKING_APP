@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Device, DeviceCommand, Lot } from "../types";
-import { Cpu, DoorOpen, Radio, RefreshCw, ShieldAlert, Wifi, WifiOff } from "lucide-react";
+import { Cpu, DoorClosed, DoorOpen, Radio, RefreshCw, ShieldAlert, Wifi, WifiOff } from "lucide-react";
 import { ConfirmModal } from "../components/CommonModals";
 import { adminApi } from "../api/adminApi";
 
@@ -13,26 +13,94 @@ interface Props {
   onError: (msg: string) => void;
 }
 
-export function DevicesTab({ lot, devices, commands, isLoading, onSuccess, onError }: Props) {
-  const [confirmDirection, setConfirmDirection] = useState<"in" | "out" | null>(null);
+export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
+  const [confirmAction, setConfirmAction] = useState<"OPEN_GATE" | "CLOSE_GATE" | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [phoneCamInfo, setPhoneCamInfo] = useState<{
+    online: boolean;
+    url: string;
+    edgeConnected: boolean;
+  }>({ online: false, url: "", edgeConnected: false });
+  const [phoneUrlInput, setPhoneUrlInput] = useState("");
+  const urlInitializedRef = useRef(false);
+  const [isSavingCamUrl, setIsSavingCamUrl] = useState(false);
 
   const deviceId = lot?.deviceId || "ESP32_PARKING_01";
-  const isGateOnline = lot?.deviceOnline ?? true;
-  const isCamOnline = lot?.camOnline ?? true;
+  const isGateOnline = lot?.deviceOnline ?? false;
+  const isBarrierOpen = Boolean(lot?.barrierOpen);
 
-  const handleOpenBarrier = async () => {
-    if (!confirmDirection) return;
+  useEffect(() => {
+    let mounted = true;
+    const fetchCamStatus = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/debug/cam-status");
+        if (!res.ok) throw new Error("Edge offline");
+        const data = await res.json();
+        if (mounted) {
+          setPhoneCamInfo({
+            online: Boolean(data.phoneCamOnline),
+            url: data.phoneCamUrl || "",
+            edgeConnected: true,
+          });
+          if (!urlInitializedRef.current && data.phoneCamUrl) {
+            setPhoneUrlInput(data.phoneCamUrl);
+            urlInitializedRef.current = true;
+          }
+        }
+      } catch {
+        if (mounted) {
+          setPhoneCamInfo((prev) => ({ ...prev, online: false, edgeConnected: false }));
+        }
+      }
+    };
+
+    fetchCamStatus();
+    const timer = setInterval(fetchCamStatus, 5000);
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const handleSavePhoneCamUrl = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingCamUrl(true);
+    try {
+      const res = await fetch("http://127.0.0.1:8000/debug/phone-cam-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          camSource: "phone",
+          phoneCamUrl: phoneUrlInput,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Không thể lưu cấu hình Camera IP");
+      }
+      setPhoneUrlInput(data.phoneCamUrl || "");
+      setPhoneCamInfo((prev) => ({ ...prev, url: data.phoneCamUrl || "", edgeConnected: true }));
+      onSuccess(`Đã lưu cấu hình Camera IP: ${data.phoneCamUrl || "(Trống)"}`);
+    } catch (err: any) {
+      onError(err.message || "Lỗi kết nối Edge Server (:8000) khi lưu IP Camera.");
+    } finally {
+      setIsSavingCamUrl(false);
+    }
+  };
+
+  const handleToggleBarrier = async () => {
+    if (!confirmAction) return;
 
     setIsSending(true);
     try {
-      const res = await adminApi.openGate(deviceId, confirmDirection);
+      const res = await adminApi.openGate(deviceId, "in", confirmAction);
+      const label = confirmAction === "CLOSE_GATE" ? "đóng" : "mở";
       onSuccess(
-        `Đã tạo lệnh mở barie ${confirmDirection.toUpperCase()} thành công (Mã lệnh: #${res.commandId.slice(-6)}). Edge Server đang nhận lệnh...`
+        `Đã tạo lệnh ${label} barie thành công (Mã lệnh: #${res.commandId.slice(-6)}). Edge Server đang gửi xuống phần cứng...`
       );
-      setConfirmDirection(null);
+      setConfirmAction(null);
     } catch (err: any) {
-      onError(err.message || "Lỗi khi gửi lệnh mở barie.");
+      onError(err.message || "Lỗi khi gửi lệnh điều khiển barie.");
     } finally {
       setIsSending(false);
     }
@@ -59,24 +127,36 @@ export function DevicesTab({ lot, devices, commands, isLoading, onSuccess, onErr
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-4">
-          <button
-            type="button"
-            onClick={() => setConfirmDirection("in")}
-            className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md shadow-emerald-600/20 transition active:scale-[0.98]"
-          >
-            <DoorOpen className="w-5 h-5" />
-            <span>Mở Barie Cổng VÀO</span>
-          </button>
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          {isBarrierOpen ? (
+            <button
+              type="button"
+              onClick={() => setConfirmAction("CLOSE_GATE")}
+              className="flex items-center space-x-2 bg-rose-600 hover:bg-rose-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md shadow-rose-600/20 transition active:scale-[0.98]"
+            >
+              <DoorClosed className="w-5 h-5" />
+              <span>Đóng Barie Cổng</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmAction("OPEN_GATE")}
+              className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md shadow-emerald-600/20 transition active:scale-[0.98]"
+            >
+              <DoorOpen className="w-5 h-5" />
+              <span>Mở Barie Cổng</span>
+            </button>
+          )}
 
-          <button
-            type="button"
-            onClick={() => setConfirmDirection("out")}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md shadow-blue-600/20 transition active:scale-[0.98]"
+          <span
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
+              isBarrierOpen
+                ? "bg-amber-50 text-amber-800 border-amber-200"
+                : "bg-slate-50 text-slate-700 border-slate-200"
+            }`}
           >
-            <DoorOpen className="w-5 h-5" />
-            <span>Mở Barie Cổng RA</span>
-          </button>
+            Trạng thái Barie: {isBarrierOpen ? "ĐANG MỞ" : "ĐANG ĐÓNG"}
+          </span>
         </div>
 
         <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs flex items-center space-x-2">
@@ -129,29 +209,56 @@ export function DevicesTab({ lot, devices, commands, isLoading, onSuccess, onErr
                 <Radio className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-800 text-sm">AI-Thinker ESP32-CAM</h4>
-                <p className="text-xs text-slate-500 font-mono">ESP32_CAM_01</p>
+                <h4 className="font-bold text-slate-800 text-sm">Camera IP (Điện thoại)</h4>
+                <p className="text-xs text-slate-500 font-mono">
+                  {phoneCamInfo.url ? phoneCamInfo.url : "Chưa cấu hình IP Webcam"}
+                </p>
               </div>
             </div>
             <span
               className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                isCamOnline ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
+                phoneCamInfo.online ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
               }`}
             >
-              {isCamOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-              <span>{isCamOnline ? "Online" : "Offline"}</span>
+              {phoneCamInfo.online ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
+              <span>
+                {!phoneCamInfo.edgeConnected
+                  ? "Mất kết nối Edge"
+                  : !phoneCamInfo.url
+                  ? "Chưa nhập IP"
+                  : phoneCamInfo.online
+                  ? "Online"
+                  : "Offline"}
+              </span>
             </span>
           </div>
 
           <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-600">
             <div className="flex justify-between">
               <span>Nhiệm vụ:</span>
-              <span className="font-medium">Chụp biển số xe SVGA khi có xe chạm cổng</span>
+              <span className="font-medium">Chụp biển số xe khi có xe chạm cổng</span>
             </div>
             <div className="flex justify-between">
               <span>Giao thức:</span>
-              <span className="font-mono text-slate-700">HTTP POST multipart/form-data (:8000)</span>
+              <span className="font-mono text-slate-700">HTTP GET /shot.jpg (IP Webcam)</span>
             </div>
+
+            <form onSubmit={handleSavePhoneCamUrl} className="pt-2 flex items-center gap-2">
+              <input
+                type="text"
+                value={phoneUrlInput}
+                onChange={(e) => setPhoneUrlInput(e.target.value)}
+                placeholder="VD: 192.168.1.15:8080"
+                className="flex-1 px-3 py-1.5 text-xs font-mono border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                type="submit"
+                disabled={isSavingCamUrl}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition"
+              >
+                {isSavingCamUrl ? "Đang lưu..." : "Lưu IP"}
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -226,16 +333,20 @@ export function DevicesTab({ lot, devices, commands, isLoading, onSuccess, onErr
         </div>
       </div>
 
-      {/* Modal xác nhận mở cổng */}
+      {/* Modal xác nhận mở/đóng cổng */}
       <ConfirmModal
-        isOpen={!!confirmDirection}
-        title="Xác nhận mở Barie khẩn cấp?"
-        message={`Bạn có chắc chắn muốn gửi lệnh mở Barie CỔNG ${confirmDirection?.toUpperCase()} tới thiết bị ${deviceId}? Thanh chắn sẽ được nâng lên lập tức.`}
-        confirmText="Mở Barie Ngay"
+        isOpen={!!confirmAction}
+        title={confirmAction === "CLOSE_GATE" ? "Xác nhận đóng Barie?" : "Xác nhận mở Barie khẩn cấp?"}
+        message={
+          confirmAction === "CLOSE_GATE"
+            ? `Bạn có chắc chắn muốn gửi lệnh ĐÓNG Barie tới thiết bị ${deviceId}?`
+            : `Bạn có chắc chắn muốn gửi lệnh MỞ Barie tới thiết bị ${deviceId}? Thanh chắn sẽ được nâng lên lập tức.`
+        }
+        confirmText={confirmAction === "CLOSE_GATE" ? "Đóng Barie Ngay" : "Mở Barie Ngay"}
         cancelText="Đóng"
         isLoading={isSending}
-        onConfirm={handleOpenBarrier}
-        onClose={() => setConfirmDirection(null)}
+        onConfirm={handleToggleBarrier}
+        onClose={() => setConfirmAction(null)}
       />
     </div>
   );

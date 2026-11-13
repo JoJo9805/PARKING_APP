@@ -11,15 +11,15 @@ export class FeeCalculator {
   public static calculateFee(
     durationMin: number,
     graceMinutes = 0,
-    blockMinutes = 30,
-    pricePerBlock = 5000,
+    blockMinutes = 60,
+    pricePerBlock = 20000,
     depositApplied = 0
   ): FeeCalculationResult {
     let fee = 0;
-    if (durationMin <= graceMinutes) {
+    if (graceMinutes > 0 && durationMin <= graceMinutes) {
       fee = 0;
     } else {
-      const chargeableMin = durationMin - graceMinutes;
+      const chargeableMin = Math.max(1, durationMin - graceMinutes);
       const blocks = Math.ceil(chargeableMin / blockMinutes);
       fee = blocks * pricePerBlock;
     }

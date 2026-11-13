@@ -1,6 +1,5 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Lot, Slot, Transaction } from "../types";
-import { AlertCircle, CheckCircle2, Clock, ShieldAlert } from "lucide-react";
 
 interface Props {
   lot: Lot | null;
@@ -9,47 +8,38 @@ interface Props {
   isLoading: boolean;
 }
 
-export function RealtimeMonitorTab({ lot, slots, transactions, isLoading }: Props) {
-  // Thống kê 4 ô
-  const occupiedCount = slots.filter((s) => s.status === "occupied").length;
-  const reservedCount = slots.filter((s) => s.status === "reserved").length;
-  const availableCount = slots.filter((s) => s.status === "available").length;
-
-  // Tính doanh thu hôm nay
-  const todayRevenue = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const startMs = today.getTime();
-
-    return transactions
-      .filter((tx) => {
-        const txMs = tx.createdAt?.toMillis ? tx.createdAt.toMillis() : tx.createdAt || 0;
-        return txMs >= startMs && tx.type === "parking_fee";
-      })
-      .reduce((sum, tx) => sum + Math.abs(tx.amount || 0), 0);
-  }, [transactions]);
+export function RealtimeMonitorTab({ lot, slots }: Props) {
+  // Thống kê 4 ô (ưu tiên trạng thái cảm biến có vật thể -> Đang đỗ)
+  const occupiedCount = slots.filter((s) => s.status === "occupied" || s.sensorOccupied).length;
+  const reservedCount = slots.filter((s) => !s.sensorOccupied && s.status === "reserved").length;
+  const availableCount = slots.filter((s) => !s.sensorOccupied && s.status === "available").length;
 
   return (
     <div className="space-y-6">
-      {/* 4 Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 3 Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Tổng Số Ô Đỗ</p>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-3xl font-black text-slate-800">{slots.length || lot?.totalSlots || 4}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-              Khu A + Khu B
-            </span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Bãi: {lot?.name || "Bãi Live ESP32"}</p>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Chỗ Còn Trống</p>
+          <p className={`text-xs font-semibold uppercase tracking-wider ${availableCount === 0 ? "text-rose-600" : "text-emerald-600"}`}>
+            Chỗ Còn Trống
+          </p>
           <div className="flex items-baseline justify-between mt-2">
-            <span className="text-3xl font-black text-emerald-600">{availableCount}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-              Sẵn sàng
+            <span className={`text-3xl font-black ${availableCount === 0 ? "text-rose-600" : "text-emerald-600"}`}>
+              {availableCount}
+            </span>
+            <span
+              className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                availableCount === 0 ? "bg-rose-100 text-rose-700" : "bg-emerald-100 text-emerald-700"
+              }`}
+            >
+              {availableCount === 0 ? "Đầy" : "Sẵn sàng"}
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-2">Khớp cảm biến hồng ngoại & cọc</p>
@@ -59,24 +49,10 @@ export function RealtimeMonitorTab({ lot, slots, transactions, isLoading }: Prop
           <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">Xe Đang Đỗ</p>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-3xl font-black text-blue-600">{occupiedCount}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-              Đang tính phí
-            </span>
           </div>
-          <p className="text-xs text-slate-400 mt-2">{occupiedCount > 0 ? "Đang có xe tại bãi" : "Chưa có xe"}</p>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-amber-600">Doanh Thu Hôm Nay</p>
-          <div className="flex items-baseline justify-between mt-2">
-            <span className="text-2xl font-black text-amber-600">
-              {todayRevenue.toLocaleString("vi-VN")}đ
-            </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-              Thực thu
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 mt-2">{reservedCount} ô đang giữ cọc 5.000đ</p>
+          <p className="text-xs text-slate-400 mt-2">
+            {occupiedCount > 0 ? "Đang có xe tại bãi" : "Chưa có xe"} ({reservedCount} ô giữ chỗ)
+          </p>
         </div>
       </div>
 
@@ -112,11 +88,9 @@ export function RealtimeMonitorTab({ lot, slots, transactions, isLoading }: Prop
         {/* 4 ô đỗ chia 2 khu A & B */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto py-8">
           {slots.map((s) => {
-            const isAvailable = s.status === "available";
-            const isOccupied = s.status === "occupied";
-            const isReserved = s.status === "reserved";
-            // Cảnh báo nếu cảm biến và trạng thái logic bị lệch (ví dụ đỗ chui không qua cổng)
-            const isSensorMismatch = s.sensorOccupied && isAvailable;
+            const isOccupied = s.status === "occupied" || Boolean(s.sensorOccupied);
+            const isReserved = !isOccupied && s.status === "reserved";
+            const isAvailable = !isOccupied && !isReserved;
 
             return (
               <div
@@ -129,13 +103,6 @@ export function RealtimeMonitorTab({ lot, slots, transactions, isLoading }: Prop
                     : "border-amber-300 bg-amber-50/50 text-amber-950"
                 }`}
               >
-                {/* Warning badge nếu đỗ sai ô / chưa qua cổng */}
-                {isSensorMismatch && (
-                  <div className="absolute top-3 right-3 flex items-center space-x-1 px-2.5 py-1 bg-rose-500 text-white text-[11px] font-bold rounded-full shadow animate-pulse">
-                    <ShieldAlert className="w-3.5 h-3.5" />
-                    <span>Cảm biến phát hiện xe!</span>
-                  </div>
-                )}
 
                 <div className="text-center">
                   <span className="text-4xl font-black tracking-tight">{s.id}</span>
@@ -178,9 +145,8 @@ export function RealtimeMonitorTab({ lot, slots, transactions, isLoading }: Prop
                   )}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-200/50 w-full flex items-center justify-between text-[11px] text-slate-500">
-                  <span>Cảm biến: {s.sensorOccupied ? "Có vật thể" : "Trống"}</span>
-                  <span className="font-mono">Cập nhật realtime</span>
+                <div className="mt-4 pt-3 border-t border-slate-200/50 w-full flex items-center justify-center text-[11px] text-slate-500">
+                  <span>Cảm biến: {s.sensorOccupied ? "Có vật thể (Đang đỗ)" : "Trống"}</span>
                 </div>
               </div>
             );
