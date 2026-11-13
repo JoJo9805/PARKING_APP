@@ -31,3 +31,6 @@ admin-web/dist/
 Thumbs.db
 *.png
 !android-app/app/src/main/res/**/*.png
+firebase-debug.log
+firestore-debug.log
+firestore-debug.log
