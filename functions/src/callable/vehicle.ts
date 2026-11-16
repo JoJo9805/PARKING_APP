@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 import { PlateUtils } from "../domain/plateUtils";
 
@@ -21,12 +21,15 @@ export const addVehicle = onCall({ region: REGION }, async (request) => {
   }
 
   const vehicleType = "car";
-  const db = admin.firestore();
+  const db = getFirestore();
   const vehicleRef = db.collection("vehicles").doc(normalized);
 
   const existing = await vehicleRef.get();
   if (existing.exists) {
-    throw new HttpsError("already-exists", "Biển số xe này đã được đăng ký trong hệ thống.");
+    const existingData = existing.data();
+    if (existingData?.ownerUid !== uid) {
+      throw new HttpsError("already-exists", "Biển số xe này đã được đăng ký trong hệ thống.");
+    }
   }
 
   const formattedDisplay = plateDisplay.trim().toUpperCase();
@@ -37,13 +40,26 @@ export const addVehicle = onCall({ region: REGION }, async (request) => {
     plateDisplay: formattedDisplay,
     type: vehicleType,
     nickname: nickname ? String(nickname).trim() : "",
-    createdAt: FieldValue.serverTimestamp(),
-  });
+    createdAt: existing.exists ? (existing.data()?.createdAt || FieldValue.serverTimestamp()) : FieldValue.serverTimestamp(),
+  }, { merge: true });
 
-  if (setDefault === true) {
-    await db.collection("users").doc(uid).update({
-      defaultVehicleId: normalized,
+  const userRef = db.collection("users").doc(uid);
+  const userDoc = await userRef.get();
+  if (!userDoc.exists) {
+    await userRef.set({
+      email: request.auth.token.email || "",
+      displayName: request.auth.token.name || "User",
+      walletBalance: 0,
+      fcmTokens: [],
+      locale: "vi",
+      defaultPlannedDurationMin: 60,
+      defaultVehicleId: setDefault === true ? normalized : null,
+      createdAt: FieldValue.serverTimestamp(),
     });
+  } else if (setDefault === true) {
+    await userRef.set({
+      defaultVehicleId: normalized,
+    }, { merge: true });
   }
 
   return {

@@ -103,7 +103,20 @@ class ReservationViewModel @Inject constructor(
         // Observe active reservation
         viewModelScope.launch {
             reservationRepository.getActiveReservationStream(uid).collect { res ->
-                _uiState.update { it.copy(activeReservation = res) }
+                if (res != null) {
+                    val serverNow = timeOffsetProvider.serverNow()
+                    val remainingMs = res.expiresAt - serverNow
+                    val remainingSec = (remainingMs / 1000).coerceAtLeast(0L)
+                    _uiState.update {
+                        it.copy(
+                            activeReservation = res,
+                            remainingSeconds = remainingSec,
+                            isExpiredPending = remainingSec == 0L
+                        )
+                    }
+                } else {
+                    _uiState.update { it.copy(activeReservation = null) }
+                }
                 updateCancelPrediction()
             }
         }

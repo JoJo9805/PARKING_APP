@@ -29,6 +29,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IOTParking"
         android:enableOnBackInvokedCallback="true"
+        android:usesCleartextTraffic="true"
         tools:targetApi="35">
 
         <!-- Activity chính -->

@@ -40,7 +40,7 @@ class VehicleRepositoryImpl @Inject constructor(
                         type = vType,
                         nickname = data["nickname"] as? String ?: "",
                         ownerUid = data["ownerUid"] as? String ?: uid,
-                        createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L
+                        createdAt = data["createdAt"].toEpochMillis() ?: 0L
                     )
                 }
                 trySend(vehicles)

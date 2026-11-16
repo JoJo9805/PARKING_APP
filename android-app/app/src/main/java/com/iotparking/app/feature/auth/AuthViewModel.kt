@@ -7,7 +7,9 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +45,8 @@ enum class PasswordStrength {
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -120,7 +123,8 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                firebaseAuth.signInWithEmailAndPassword(state.email.trim(), state.password).await()
+                val result = firebaseAuth.signInWithEmailAndPassword(state.email.trim(), state.password).await()
+                result.user?.let { ensureUserDocumentExists(it) }
                 _uiState.update { it.copy(isLoading = false, loginSuccess = true) }
             } catch (e: FirebaseAuthInvalidCredentialsException) {
                 _uiState.update {
@@ -166,6 +170,7 @@ class AuthViewModel @Inject constructor(
                         displayName = state.displayName.trim()
                     }
                 )?.await()
+                result.user?.let { ensureUserDocumentExists(it) }
                 _uiState.update { it.copy(isLoading = false, registerSuccess = true) }
             } catch (e: FirebaseAuthWeakPasswordException) {
                 _uiState.update {
@@ -288,6 +293,27 @@ class AuthViewModel @Inject constructor(
             score <= 1 -> PasswordStrength.WEAK
             score <= 3 -> PasswordStrength.MEDIUM
             else -> PasswordStrength.STRONG
+        }
+    }
+
+    private suspend fun ensureUserDocumentExists(user: FirebaseUser) {
+        try {
+            val docRef = firestore.collection("users").document(user.uid)
+            val snapshot = docRef.get().await()
+            if (!snapshot.exists()) {
+                val userData = hashMapOf<String, Any>(
+                    "email" to (user.email ?: ""),
+                    "displayName" to (user.displayName ?: user.email?.substringBefore("@") ?: "User"),
+                    "walletBalance" to 0L,
+                    "fcmTokens" to emptyList<String>(),
+                    "locale" to "vi",
+                    "defaultPlannedDurationMin" to 60,
+                    "createdAt" to System.currentTimeMillis()
+                )
+                docRef.set(userData).await()
+            }
+        } catch (_: Exception) {
+            // Không chặn luồng nếu Firestore chưa sẵn sàng
         }
     }
 }

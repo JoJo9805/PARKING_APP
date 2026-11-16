@@ -1,9 +1,10 @@
 import * as admin from "firebase-admin";
+import { getFirestore, FieldValue, GeoPoint } from "firebase-admin/firestore";
 
 const projectId =
   process.env.GCLOUD_PROJECT ||
   process.env.FIREBASE_PROJECT ||
-  "demo-iot-parking-smart";
+  "iot-parking-smart";
 
 process.env.GCLOUD_PROJECT = projectId;
 
@@ -21,7 +22,7 @@ if (!admin.apps.length) {
   });
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 
 async function seedData() {
   console.log("🚀 Bắt đầu nạp dữ liệu Seed Data cho hệ thống Bãi đỗ xe...");
@@ -31,7 +32,7 @@ async function seedData() {
   await liveLotRef.set({
     name: "Bãi đỗ Live Thông Minh A-B (Trạm ESP32)",
     address: "Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội",
-    location: new admin.firestore.GeoPoint(21.005, 105.843),
+    location: new GeoPoint(21.005, 105.843),
     photos: [
       "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=800&q=80",
     ],
@@ -53,7 +54,7 @@ async function seedData() {
     openHours: "00:00 - 24:00",
     rating: 4.9,
     ratingCount: 128,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 
   // 4 Slot thực tế của bãi Live
@@ -71,7 +72,7 @@ async function seedData() {
       status: s.status,
       reservationId: null,
       sessionId: null,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
   }
   console.log("✅ Đã tạo bãi Live: lot_live_01 với 4 slots: A1, A2, B1, B2");
@@ -82,7 +83,7 @@ async function seedData() {
       id: "lot_mock_01",
       name: "Bãi xe Vincom Mega Mall Thảo Điền",
       address: "161 Xa Lộ Hà Nội, P. Thảo Điền, TP. Thủ Đức, TP.HCM",
-      location: new admin.firestore.GeoPoint(10.803, 106.74),
+      location: new GeoPoint(10.803, 106.74),
       photos: [
         "https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=800&q=80",
       ],
@@ -98,7 +99,7 @@ async function seedData() {
       id: "lot_mock_02",
       name: "Bãi đỗ tòa nhà Bitexco Financial Tower",
       address: "2 Hải Triều, P. Bến Nghé, Quận 1, TP.HCM",
-      location: new admin.firestore.GeoPoint(10.771, 106.704),
+      location: new GeoPoint(10.771, 106.704),
       photos: [
         "https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?auto=format&fit=crop&w=800&q=80",
       ],
@@ -114,7 +115,7 @@ async function seedData() {
       id: "lot_mock_03",
       name: "Bãi xe Trung tâm Crescent Mall",
       address: "101 Tôn Dật Tiên, P. Tân Phú, Quận 7, TP.HCM",
-      location: new admin.firestore.GeoPoint(10.718, 106.72),
+      location: new GeoPoint(10.718, 106.72),
       photos: [
         "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80",
       ],
@@ -130,7 +131,7 @@ async function seedData() {
       id: "lot_mock_04",
       name: "Bãi đỗ Nhà ga Quốc nội Tân Sơn Nhất",
       address: "Trường Sơn, P. 2, Quận Tân Bình, TP.HCM",
-      location: new admin.firestore.GeoPoint(10.818, 106.666),
+      location: new GeoPoint(10.818, 106.666),
       photos: [
         "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
       ],
@@ -146,7 +147,7 @@ async function seedData() {
       id: "lot_mock_05",
       name: "Bãi xe Saigon Centre & Takashimaya",
       address: "65 Lê Lợi, P. Bến Nghé, Quận 1, TP.HCM",
-      location: new admin.firestore.GeoPoint(10.773, 106.701),
+      location: new GeoPoint(10.773, 106.701),
       photos: [
         "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=800&q=80",
       ],
@@ -162,7 +163,7 @@ async function seedData() {
       id: "lot_mock_06",
       name: "Bãi đỗ Aeon Mall Tân Phú Celadon",
       address: "30 Bờ Bao Tân Thắng, P. Sơn Kỳ, Q. Tân Phú, TP.HCM",
-      location: new admin.firestore.GeoPoint(10.801, 106.616),
+      location: new GeoPoint(10.801, 106.616),
       photos: [
         "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=800&q=80",
       ],
@@ -200,7 +201,7 @@ async function seedData() {
       openHours: "07:00 - 23:00",
       rating: m.rating,
       ratingCount: 85,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
   }
   console.log("✅ Đã tạo 6 bãi mock vệ tinh thành công.");
@@ -224,7 +225,7 @@ async function seedData() {
         email: adminEmail,
         displayName: "Ban Quản Trị Bãi Đỗ",
         walletBalance: 1000000,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );

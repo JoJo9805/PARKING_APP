@@ -42,7 +42,7 @@ class NotificationRepositoryImpl @Inject constructor(
                     body = data["body"] as? String ?: "",
                     refId = data["refId"] as? String,
                     read = data["read"] as? Boolean ?: false,
-                    createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L
+                    createdAt = data["createdAt"].toEpochMillis() ?: 0L
                 )
             }
             trySend(list)

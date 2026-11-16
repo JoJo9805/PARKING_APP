@@ -76,7 +76,7 @@ class LotRepositoryImpl @Inject constructor(
                         status = status,
                         reservationId = data["reservationId"] as? String,
                         sessionId = data["sessionId"] as? String,
-                        updatedAt = (data["updatedAt"] as? Number)?.toLong() ?: 0L
+                        updatedAt = data["updatedAt"].toEpochMillis() ?: 0L
                     )
                 }
                 trySend(slots)

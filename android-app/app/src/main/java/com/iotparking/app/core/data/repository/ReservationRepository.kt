@@ -103,8 +103,8 @@ class ReservationRepositoryImpl @Inject constructor(
             plate = data["plate"] as? String ?: "",
             plateDisplay = data["plateDisplay"] as? String ?: (data["plate"] as? String ?: ""),
             status = status,
-            createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L,
-            expiresAt = (data["expiresAt"] as? Number)?.toLong() ?: 0L,
+            createdAt = data["createdAt"].toEpochMillis() ?: 0L,
+            expiresAt = data["expiresAt"].toEpochMillis() ?: 0L,
             remindedExpiring = data["remindedExpiring"] as? Boolean ?: false,
             extendCount = (data["extendCount"] as? Number)?.toInt() ?: 0,
             maxExtendCount = (data["maxExtendCount"] as? Number)?.toInt() ?: 1,
@@ -112,5 +112,14 @@ class ReservationRepositoryImpl @Inject constructor(
             depositStatus = depStatus
         )
     }
+}
+
+/**
+ * Chuyển đổi linh hoạt cả Firestore Timestamp lẫn Number (Long/Int/Double) sang epoch milliseconds (Long).
+ */
+internal fun Any?.toEpochMillis(): Long? = when (this) {
+    is com.google.firebase.Timestamp -> this.toDate().time
+    is Number -> this.toLong()
+    else -> null
 }
 

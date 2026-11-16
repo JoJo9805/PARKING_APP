@@ -1,6 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { REGION } from "../config";
 import { FcmService } from "../services/fcmService";
 
@@ -16,7 +15,7 @@ export const topUpWallet = onCall({ region: REGION }, async (request) => {
     throw new HttpsError("invalid-argument", "Số tiền nạp không hợp lệ.");
   }
 
-  const db = admin.firestore();
+  const db = getFirestore();
   const userRef = db.collection("users").doc(uid);
   const txRef = db.collection("transactions").doc();
 
@@ -25,15 +24,24 @@ export const topUpWallet = onCall({ region: REGION }, async (request) => {
   await db.runTransaction(async (transaction) => {
     const userDoc = await transaction.get(userRef);
     if (!userDoc.exists) {
-      throw new HttpsError("not-found", "Người dùng không tồn tại.");
+      finalBalance = numAmount;
+      transaction.set(userRef, {
+        email: request.auth?.token?.email || "",
+        displayName: request.auth?.token?.name || "User",
+        walletBalance: numAmount,
+        fcmTokens: [],
+        locale: "vi",
+        defaultPlannedDurationMin: 60,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    } else {
+      const currentBalance = Number(userDoc.data()?.walletBalance || 0);
+      finalBalance = currentBalance + numAmount;
+
+      transaction.update(userRef, {
+        walletBalance: finalBalance,
+      });
     }
-
-    const currentBalance = Number(userDoc.data()?.walletBalance || 0);
-    finalBalance = currentBalance + numAmount;
-
-    transaction.update(userRef, {
-      walletBalance: finalBalance,
-    });
 
     transaction.set(txRef, {
       uid,

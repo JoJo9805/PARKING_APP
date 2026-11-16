@@ -23,6 +23,19 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    /**
+     * Bật USE_EMULATOR = true khi chạy kiểm thử với Firebase Local Emulator Suite.
+     * Đổi thành false khi muốn kết nối lên Firebase Cloud Production.
+     */
+    const val USE_EMULATOR = true
+
+    /**
+     * Địa chỉ IP của máy host chạy Firebase Emulator:
+     * - "10.0.2.2": Mặc định cho máy ảo Android Studio (Android Virtual Device - AVD)
+     * - "192.168.x.x": Thay bằng IP LAN máy tính nếu chạy trên điện thoại thật kết nối cùng WiFi
+     */
+    const val EMULATOR_HOST = "10.0.2.2"
+
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
@@ -32,25 +45,57 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth {
-        return FirebaseAuth.getInstance()
+        val auth = FirebaseAuth.getInstance()
+        if (USE_EMULATOR) {
+            try {
+                auth.useEmulator(EMULATOR_HOST, 9099)
+            } catch (e: Exception) {
+                // Đã khởi tạo emulator trước đó
+            }
+        }
+        return auth
     }
 
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore {
-        return FirebaseFirestore.getInstance()
+        val firestore = FirebaseFirestore.getInstance()
+        if (USE_EMULATOR) {
+            try {
+                firestore.useEmulator(EMULATOR_HOST, 8080)
+            } catch (e: Exception) {
+                // Đã khởi tạo emulator trước đó
+            }
+        }
+        return firestore
     }
 
     @Provides
     @Singleton
     fun provideFirebaseFunctions(): FirebaseFunctions {
-        return FirebaseFunctions.getInstance("asia-southeast1")
+        val functions = FirebaseFunctions.getInstance("asia-southeast1")
+        if (USE_EMULATOR) {
+            try {
+                functions.useEmulator(EMULATOR_HOST, 5001)
+            } catch (e: Exception) {
+                // Đã khởi tạo emulator trước đó
+            }
+        }
+        return functions
     }
 
     @Provides
     @Singleton
     fun provideFirebaseStorage(): FirebaseStorage {
-        return FirebaseStorage.getInstance()
+        val storage = FirebaseStorage.getInstance()
+        if (USE_EMULATOR) {
+            try {
+                storage.useEmulator(EMULATOR_HOST, 9199)
+            } catch (e: Exception) {
+                // Đã khởi tạo emulator trước đó
+            }
+        }
+        return storage
     }
 
     @Provides

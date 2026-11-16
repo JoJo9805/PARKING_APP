@@ -44,7 +44,7 @@ class UserRepositoryImpl @Inject constructor(
                     fcmTokens = (data["fcmTokens"] as? List<String>) ?: emptyList(),
                     locale = data["locale"] as? String ?: "vi",
                     defaultPlannedDurationMin = (data["defaultPlannedDurationMin"] as? Number)?.toInt() ?: 60,
-                    createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L
+                    createdAt = data["createdAt"].toEpochMillis() ?: 0L
                 )
                 trySend(user)
             } else {

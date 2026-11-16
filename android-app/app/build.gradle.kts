@@ -26,7 +26,15 @@ android {
         }
 
         // Đọc Google Maps API key từ local.properties
-        val mapsApiKey: String = project.findProperty("MAPS_API_KEY") as? String ?: ""
+        val localProps = java.util.Properties().apply {
+            val localPropsFile = rootProject.file("local.properties")
+            if (localPropsFile.exists()) {
+                localPropsFile.inputStream().use { load(it) }
+            }
+        }
+        val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY")
+            ?: (project.findProperty("MAPS_API_KEY") as? String)
+            ?: ""
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
@@ -34,7 +42,7 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            applicationIdSuffix = ".debug"
+            //applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
         }
         release {

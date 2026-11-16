@@ -54,7 +54,7 @@ class WalletRepositoryImpl @Inject constructor(
                     methodLabel = data["methodLabel"] as? String,
                     invoiceNo = data["invoiceNo"] as? String,
                     description = data["description"] as? String,
-                    createdAt = (data["createdAt"] as? Number)?.toLong() ?: 0L
+                    createdAt = data["createdAt"].toEpochMillis() ?: 0L
                 )
             }
             trySend(list)
