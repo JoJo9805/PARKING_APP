@@ -4,7 +4,7 @@ import { getFirestore, FieldValue, GeoPoint } from "firebase-admin/firestore";
 const projectId =
   process.env.GCLOUD_PROJECT ||
   process.env.FIREBASE_PROJECT ||
-  "iot-parking-smart";
+  "demo-iot-parking-smart";
 
 process.env.GCLOUD_PROJECT = projectId;
 
@@ -44,7 +44,7 @@ async function seedData() {
     pricePerBlock: 20000,
     blockMinutes: 60,
     graceMinutes: 0,
-    depositAmount: 5000,
+    depositAmount: 0,
     freeCancelMinutes: 2,
     holdDurationMinutes: 15,
     maxExtendCount: 1,
@@ -191,7 +191,7 @@ async function seedData() {
       pricePerBlock: m.pricePerBlock,
       blockMinutes: m.blockMinutes,
       graceMinutes: 0,
-      depositAmount: 5000,
+      depositAmount: 0,
       freeCancelMinutes: 2,
       holdDurationMinutes: 15,
       maxExtendCount: 1,
@@ -212,6 +212,10 @@ async function seedData() {
     let adminUser: admin.auth.UserRecord;
     try {
       adminUser = await admin.auth().getUserByEmail(adminEmail);
+      adminUser = await admin.auth().updateUser(adminUser.uid, {
+        password: "AdminPassword123!",
+        displayName: "Ban Quản Trị Bãi Đỗ",
+      });
     } catch {
       adminUser = await admin.auth().createUser({
         email: adminEmail,

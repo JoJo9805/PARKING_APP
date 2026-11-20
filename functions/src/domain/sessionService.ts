@@ -65,7 +65,7 @@ export class SessionService {
       if (resDoc.exists) {
         const resData = resDoc.data() || {};
         assignedSlotId = resData.slotId || assignedSlotId;
-        depositApplied = Number(resData.depositAmount ?? BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT);
+        depositApplied = Number(resData.depositAmount ?? 0);
         sessionUid = resData.uid || null;
 
         await resDoc.ref.update({
@@ -87,7 +87,7 @@ export class SessionService {
         const resData = resDoc.data();
         matchedReservationId = resDoc.id;
         assignedSlotId = resData.slotId;
-        depositApplied = Number(resData.depositAmount ?? BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT);
+        depositApplied = Number(resData.depositAmount ?? 0);
         sessionUid = resData.uid || null;
 
         await resDoc.ref.update({
@@ -211,6 +211,27 @@ export class SessionService {
     let sessionUid: string | null = null;
     let slotIdToFree = "";
 
+    const preSessionSnap = await sessionRef.get();
+    if (!preSessionSnap.exists) {
+      throw new Error("Không tìm thấy phiên đỗ xe.");
+    }
+    const preUid: string | null = preSessionSnap.data()?.uid || null;
+    let paymentMethodLabel = "Thẻ thanh toán ảo (Demo)";
+    if (preUid) {
+      const pmSnap = await db
+        .collection("users")
+        .doc(preUid)
+        .collection("paymentMethods")
+        .get();
+      if (!pmSnap.empty) {
+        const docs = pmSnap.docs.map((d) => d.data() || {});
+        const defaultCard = docs.find((d) => d.isDefault === true) || docs[0];
+        if (defaultCard) {
+          paymentMethodLabel = `${defaultCard.brand || "Visa"} •••• ${defaultCard.last4 || "0000"}`;
+        }
+      }
+    }
+
     await db.runTransaction(async (transaction) => {
       const sDoc = await transaction.get(sessionRef);
       if (!sDoc.exists) {
@@ -270,55 +291,32 @@ export class SessionService {
       resultDepositRefund = feeResult.depositRefund;
       invoiceId = `INV-${sessionRef.id.slice(-6).toUpperCase()}`;
 
-      // Xử lý ví người dùng
-      if (sessionUid) {
-        const userRef = db.collection("users").doc(sessionUid);
-        const userDoc = await transaction.get(userRef);
-        if (userDoc.exists) {
-          const currentBal = Number(userDoc.data()?.walletBalance || 0);
-          const newBal = currentBal - resultAmountCharged + resultDepositRefund;
-
-          transaction.update(userRef, { walletBalance: newBal });
-
-          // Giao dịch thanh toán phí đỗ xe nếu có thu thêm
-          if (resultAmountCharged > 0) {
-            const feeTxRef = db.collection("transactions").doc();
-            transaction.set(feeTxRef, {
-              uid: sessionUid,
-              type: "parking_fee",
-              amount: -resultAmountCharged,
-              balanceAfter: newBal + resultDepositRefund,
-              sessionId: sessionRef.id,
-              methodLabel: "Ví nội bộ",
-              invoiceNo: invoiceId,
-              description: params.closedByAdmin
-                ? `Quản trị viên đóng phiên đỗ ${resultDurationMin} phút tại ${lotName}`
-                : `Thanh toán phí đỗ xe ${resultDurationMin} phút tại ${lotName}`,
-              createdAt: FieldValue.serverTimestamp(),
-            });
-          }
-
-          // Giao dịch hoàn cọc dư nếu có (v1.1)
-          if (resultDepositRefund > 0) {
-            const refundTxRef = db.collection("transactions").doc();
-            transaction.set(refundTxRef, {
-              uid: sessionUid,
-              type: "deposit_excess_refund",
-              amount: resultDepositRefund,
-              balanceAfter: newBal,
-              sessionId: sessionRef.id,
-              methodLabel: "Hoàn cọc dư ví",
-              invoiceNo: `EXC-${sessionRef.id.slice(-6).toUpperCase()}`,
-              description: `Hoàn phần tiền cọc dư (${resultDepositRefund.toLocaleString("vi-VN")}đ) phiên đỗ ${lotName}`,
-              createdAt: FieldValue.serverTimestamp(),
-            });
-          }
-        }
+      // Ghi nhận giao dịch thanh toán qua thẻ thanh toán ảo liên kết (Demo), không trừ ví
+      if (sessionUid && resultAmountCharged > 0) {
+        const feeTxRef = db.collection("transactions").doc();
+        transaction.set(feeTxRef, {
+          uid: sessionUid,
+          type: "parking_fee",
+          amount: -resultAmountCharged,
+          balanceAfter: 0,
+          sessionId: sessionRef.id,
+          methodLabel: paymentMethodLabel,
+          invoiceNo: invoiceId,
+          description: params.closedByAdmin
+            ? `Quản trị viên đóng phiên đỗ ${resultDurationMin} phút tại ${lotName}`
+            : `Thanh toán phí đỗ xe ${resultDurationMin} phút tại ${lotName} (${paymentMethodLabel})`,
+          createdAt: FieldValue.serverTimestamp(),
+        });
       }
 
       // Cập nhật session
       transaction.update(sessionRef, {
         status: "completed",
+        exitRequested: false,
+        waitingAtExitGate: false,
+        waitingAtExitGateAt: FieldValue.delete(),
+        waitingExitGateEventId: FieldValue.delete(),
+        waitingExitImageUrl: FieldValue.delete(),
         exitTime: Timestamp.fromMillis(effectiveExitMs),
         durationMin: resultDurationMin,
         fee: resultFee,
@@ -359,7 +357,7 @@ export class SessionService {
         },
         {
           title: "Xe đã rời bãi",
-          body: `Xe ${PlateUtils.formatDisplay(plateNormalized)} đã ra khỏi ${lotName}. Phí: ${resultFee.toLocaleString("vi-VN")}đ (Trừ ví: ${resultAmountCharged.toLocaleString("vi-VN")}đ, Hoàn cọc: ${resultDepositRefund.toLocaleString("vi-VN")}đ).`,
+          body: `Xe ${PlateUtils.formatDisplay(plateNormalized)} đã ra khỏi ${lotName}. Phí đỗ xe: ${resultFee.toLocaleString("vi-VN")}đ (${paymentMethodLabel}).`,
           refId: params.sessionId,
         }
       );

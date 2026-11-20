@@ -31,6 +31,7 @@ import { SessionsTab } from "./pages/SessionsTab";
 import { ReservationsTab } from "./pages/ReservationsTab";
 import { PricingConfigTab } from "./pages/PricingConfigTab";
 import { DevicesTab } from "./pages/DevicesTab";
+import { ManualGateModal } from "./components/ManualGateModal";
 
 type Tab =
   | "realtime"
@@ -46,6 +47,7 @@ function DashboardContent() {
 
   // Thông báo Toast
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [locallyHandledIds, setLocallyHandledIds] = useState<string[]>([]);
 
   const showSuccess = (msg: string) => setToast({ message: msg, type: "success" });
   const showError = (msg: string) => setToast({ message: msg, type: "error" });
@@ -61,6 +63,14 @@ function DashboardContent() {
   const { transactions, loading: loadingTransactions } = useTransactions(100);
 
   const isGateOnline = lot?.deviceOnline ?? false;
+  const activeSessions = sessions.filter((s) => s.status === "active");
+  const pendingManualEvents = events.filter(
+    (ev) =>
+      !locallyHandledIds.includes(ev.id) &&
+      (ev.status === "pending_manual" ||
+        (ev.status === "pending" && !ev.plateNormalized && ev.decision !== "denied"))
+  );
+  const currentPendingEvent = pendingManualEvents[0] || null;
 
   return (
     <div className="flex h-screen bg-slate-50 font-sans antialiased text-slate-900">
@@ -211,6 +221,7 @@ function DashboardContent() {
           {activeTab === "gate-events" && (
             <GateEventsTab
               events={events}
+              sessions={sessions}
               isLoading={loadingEvents}
               onSuccess={showSuccess}
               onError={showError}
@@ -259,6 +270,22 @@ function DashboardContent() {
           )}
         </div>
       </main>
+
+      {/* Popup toàn cục tự động hiện khi xe vào/ra không quét được biển số */}
+      <ManualGateModal
+        event={currentPendingEvent}
+        activeSessions={activeSessions}
+        pendingCount={pendingManualEvents.length}
+        onClose={() => {
+          if (currentPendingEvent) {
+            setLocallyHandledIds((prev) =>
+              prev.includes(currentPendingEvent.id) ? prev : [...prev, currentPendingEvent.id]
+            );
+          }
+        }}
+        onSuccess={showSuccess}
+        onError={showError}
+      />
     </div>
   );
 }

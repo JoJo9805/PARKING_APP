@@ -75,7 +75,7 @@
     <string name="nav_explore">Khám phá</string>
     <string name="nav_activity">Hoạt động</string>
     <string name="nav_history">Lịch sử</string>
-    <string name="nav_wallet">Ví</string>
+    <string name="nav_wallet">Thẻ</string>
     <string name="nav_account">Tài khoản</string>
 
     <!-- Lot -->
@@ -146,7 +146,7 @@
     <string name="statistics_title">Thống kê</string>
 
     <!-- Wallet -->
-    <string name="wallet_title">Ví</string>
+    <string name="wallet_title">Thẻ thanh toán</string>
     <string name="wallet_balance">Số dư</string>
     <string name="wallet_top_up">Nạp tiền</string>
     <string name="wallet_transaction_history">Lịch sử giao dịch</string>
@@ -172,7 +172,7 @@
     <string name="payment_method_card_number_label">Số thẻ</string>
     <string name="payment_method_holder_name_label">Tên chủ thẻ</string>
     <string name="payment_method_no_cards_title">Chưa có thẻ</string>
-    <string name="payment_method_no_cards_description">Thêm thẻ để nạp tiền vào ví.</string>
+    <string name="payment_method_no_cards_description">Thêm thẻ thanh toán ảo để demo thanh toán tự động.</string>
 
     <!-- Vehicle -->
     <string name="vehicle_title">Xe của tôi</string>
@@ -217,7 +217,7 @@
     <string name="onboarding_title_2">Đặt chỗ trước</string>
     <string name="onboarding_desc_2">Đặt trước chỗ đỗ và không phải lo lắng tìm chỗ.</string>
     <string name="onboarding_title_3">Thanh toán thông minh</string>
-    <string name="onboarding_desc_3">Thanh toán dễ dàng bằng ví điện tử. Nạp tiền mọi lúc.</string>
+    <string name="onboarding_desc_3">Liên kết thẻ thanh toán ảo để demo thanh toán tự động khi rời bãi.</string>
     <string name="onboarding_skip">Bỏ qua</string>
     <string name="onboarding_next">Tiếp theo</string>
     <string name="onboarding_get_started">Bắt đầu</string>
@@ -244,7 +244,7 @@
     <string name="tab_explore">Khám phá</string>
     <string name="tab_activity">Hoạt động</string>
     <string name="tab_history">Lịch sử</string>
-    <string name="tab_wallet">Ví</string>
+    <string name="tab_wallet">Thẻ</string>
     <string name="tab_account">Tài khoản</string>
 
     <!-- Screen Titles -->

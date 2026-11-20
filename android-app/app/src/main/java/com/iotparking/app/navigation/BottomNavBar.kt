@@ -1,7 +1,7 @@
 package com.iotparking.app.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.History
@@ -28,7 +28,7 @@ sealed class BottomNavItem(
     data object Explore : BottomNavItem(Route.Explore.route, R.string.tab_explore, Icons.Default.Explore)
     data object Activity : BottomNavItem(Route.Activity.route, R.string.tab_activity, Icons.Default.DirectionsCar)
     data object History : BottomNavItem(Route.History.route, R.string.tab_history, Icons.Default.History)
-    data object Wallet : BottomNavItem(Route.Wallet.route, R.string.tab_wallet, Icons.Default.AccountBalanceWallet)
+    data object Wallet : BottomNavItem(Route.Wallet.route, R.string.tab_wallet, Icons.Default.CreditCard)
     data object Account : BottomNavItem(Route.Account.route, R.string.tab_account, Icons.Default.Person)
 }
 

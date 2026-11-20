@@ -106,7 +106,7 @@ class LotRepositoryImpl @Inject constructor(
             pricePerBlock = (data["pricePerBlock"] as? Number)?.toLong() ?: 5000L,
             blockMinutes = (data["blockMinutes"] as? Number)?.toInt() ?: 30,
             graceMinutes = (data["graceMinutes"] as? Number)?.toInt() ?: 0,
-            depositAmount = (data["depositAmount"] as? Number)?.toLong() ?: 5000L,
+            depositAmount = (data["depositAmount"] as? Number)?.toLong() ?: 0L,
             freeCancelMinutes = (data["freeCancelMinutes"] as? Number)?.toInt() ?: 2,
             holdDurationMinutes = (data["holdDurationMinutes"] as? Number)?.toInt() ?: 15,
             maxExtendCount = (data["maxExtendCount"] as? Number)?.toInt() ?: 1,

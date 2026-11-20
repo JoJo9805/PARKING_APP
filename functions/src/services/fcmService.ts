@@ -8,7 +8,8 @@ export interface FcmPayloadData {
     | "RESERVATION_EXPIRING"
     | "RESERVATION_EXPIRED"
     | "PLANNED_DURATION_NEAR"
-    | "WALLET_CHANGED";
+    | "WALLET_CHANGED"
+    | "EXIT_WAITING_CONFIRM";
   [key: string]: string;
 }
 

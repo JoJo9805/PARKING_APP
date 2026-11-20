@@ -179,12 +179,7 @@ fun AppNavHost(
 
             composable(Route.Wallet.route) {
                 val walletViewModel: WalletViewModel = hiltViewModel()
-                WalletScreen(
-                    viewModel = walletViewModel,
-                    onNavigateToCardManagement = {
-                        navController.navigate(Route.CardManagement.route)
-                    }
-                )
+                WalletScreen(viewModel = walletViewModel)
             }
 
             composable(Route.Account.route) {
@@ -248,7 +243,7 @@ fun AppNavHost(
                             popUpTo(Route.Explore.route)
                         }
                     },
-                    onNavigateToWallet = { navController.navigate(Route.Wallet.route) },
+                    onNavigateToCardManagement = { navController.navigate(Route.CardManagement.route) },
                     onNavigateToAddVehicle = { navController.navigate(Route.AddVehicle.route) }
                 )
             }

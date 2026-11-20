@@ -219,12 +219,12 @@ fun LotDetailScreen(
 
                             Column {
                                 Text(
-                                    text = "Tiền cọc giữ chỗ",
+                                    text = "Đặt chỗ trước",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Text(
-                                    text = "${lot.depositAmount}đ",
+                                    text = "Miễn phí",
                                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.primary
                                 )
@@ -279,7 +279,7 @@ fun LotDetailScreen(
 
                     // Sơ đồ ô đỗ xe thời gian thực
                     Text(
-                        text = "Sơ đồ bãi đỗ xe (${lot.availableSlots}/${lot.totalSlots} chỗ trống)",
+                        text = "Sơ đồ bãi đỗ xe (${uiState.liveAvailableSlots}/${lot.totalSlots} chỗ trống)",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.height(10.dp))

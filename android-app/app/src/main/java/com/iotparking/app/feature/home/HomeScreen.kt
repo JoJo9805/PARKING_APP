@@ -170,7 +170,7 @@ fun HomeScreen(
                     Marker(
                         state = MarkerState(position = LatLng(lot.latitude, lot.longitude)),
                         title = lot.name,
-                        snippet = "Còn ${lot.availableSlots}/${lot.totalSlots} chỗ • ${lot.pricePerBlock}đ/30p",
+                        snippet = "Còn ${lot.availableSlots}/${lot.totalSlots} chỗ • ${lot.pricePerBlock}đ/${lot.blockMinutes}p",
                         onClick = {
                             viewModel.onLotSelected(lot)
                             false

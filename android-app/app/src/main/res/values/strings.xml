@@ -75,7 +75,7 @@
     <string name="nav_explore">Explore</string>
     <string name="nav_activity">Activity</string>
     <string name="nav_history">History</string>
-    <string name="nav_wallet">Wallet</string>
+    <string name="nav_wallet">Cards</string>
     <string name="nav_account">Account</string>
 
     <!-- Lot -->
@@ -146,7 +146,7 @@
     <string name="statistics_title">Statistics</string>
 
     <!-- Wallet -->
-    <string name="wallet_title">Wallet</string>
+    <string name="wallet_title">Payment Cards</string>
     <string name="wallet_balance">Balance</string>
     <string name="wallet_top_up">Top Up</string>
     <string name="wallet_transaction_history">Transaction History</string>
@@ -172,7 +172,7 @@
     <string name="payment_method_card_number_label">Card Number</string>
     <string name="payment_method_holder_name_label">Cardholder Name</string>
     <string name="payment_method_no_cards_title">No Payment Methods</string>
-    <string name="payment_method_no_cards_description">Add a card to top up your wallet.</string>
+    <string name="payment_method_no_cards_description">Add a virtual card for demo checkout.</string>
 
     <!-- Vehicle -->
     <string name="vehicle_title">My Vehicles</string>
@@ -217,7 +217,7 @@
     <string name="onboarding_title_2">Reserve Your Spot</string>
     <string name="onboarding_desc_2">Book a parking slot in advance and never worry about finding a spot.</string>
     <string name="onboarding_title_3">Smart Payments</string>
-    <string name="onboarding_desc_3">Pay seamlessly with your digital wallet. Top up anytime.</string>
+    <string name="onboarding_desc_3">Link a virtual payment card for seamless demo checkout when exiting.</string>
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_get_started">Get Started</string>
@@ -244,7 +244,7 @@
     <string name="tab_explore">Explore</string>
     <string name="tab_activity">Activity</string>
     <string name="tab_history">History</string>
-    <string name="tab_wallet">Wallet</string>
+    <string name="tab_wallet">Cards</string>
     <string name="tab_account">Account</string>
 
     <!-- Screen Titles -->

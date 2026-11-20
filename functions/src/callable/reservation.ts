@@ -15,149 +15,119 @@ export const createReservation = onCall({ region: REGION }, async (request) => {
     throw new HttpsError("invalid-argument", "Thiếu thông tin bãi đỗ hoặc biển số xe.");
   }
 
+  const normalizedPlate = PlateUtils.normalize(String(plateNormalized));
+  if (!PlateUtils.isValid(normalizedPlate)) {
+    throw new HttpsError("invalid-argument", "Biển số xe không hợp lệ.");
+  }
+
   const db = admin.firestore();
-  const userRef = db.collection("users").doc(uid);
   const lotRef = db.collection("lots").doc(lotId);
 
-  // 1. Kiểm tra ví người dùng
-  const userDoc = await userRef.get();
-  if (!userDoc.exists) {
-    throw new HttpsError("not-found", "Người dùng không tồn tại.");
-  }
-  const userData = userDoc.data() || {};
-  const walletBalance = Number(userData.walletBalance || 0);
+  // 1. Quy tắc 1 hoạt động: kiểm tra theo cả uid và biển số xe
+  const [activeResByUid, activeSessByUid, activeResByPlate, activeSessByPlate] =
+    await Promise.all([
+      db
+        .collection("reservations")
+        .where("uid", "==", uid)
+        .where("status", "==", "active")
+        .limit(1)
+        .get(),
+      db
+        .collection("sessions")
+        .where("uid", "==", uid)
+        .where("status", "==", "active")
+        .limit(1)
+        .get(),
+      db
+        .collection("reservations")
+        .where("plate", "==", normalizedPlate)
+        .where("status", "==", "active")
+        .limit(1)
+        .get(),
+      db
+        .collection("sessions")
+        .where("plate", "==", normalizedPlate)
+        .where("status", "==", "active")
+        .limit(1)
+        .get(),
+    ]);
 
-  if (walletBalance < 0) {
-    throw new HttpsError("failed-precondition", "Ví nội bộ của bạn đang bị âm tiền.", {
-      reason: "NEGATIVE_BALANCE",
-    });
-  }
-
-  const depositAmount = BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT;
-  if (walletBalance < depositAmount) {
+  if (!activeResByUid.empty || !activeResByPlate.empty) {
     throw new HttpsError(
       "failed-precondition",
-      `Số dư không đủ đặt cọc (${depositAmount.toLocaleString("vi-VN")}đ).`,
-      { reason: "INSUFFICIENT_BALANCE" }
-    );
-  }
-
-  // 2. Quy tắc 1 hoạt động: không có reservation active và không có session active
-  const activeRes = await db
-    .collection("reservations")
-    .where("uid", "==", uid)
-    .where("status", "==", "active")
-    .limit(1)
-    .get();
-
-  if (!activeRes.empty) {
-    throw new HttpsError(
-      "failed-precondition",
-      "Bạn đang có một lượt giữ chỗ đang hoạt động.",
+      "Bạn hoặc biển số xe này đang có một lượt giữ chỗ đang hoạt động.",
       { reason: "HAS_ACTIVE_RESERVATION" }
     );
   }
 
-  const activeSessions = await db
-    .collection("sessions")
-    .where("uid", "==", uid)
-    .where("status", "==", "active")
-    .limit(1)
-    .get();
-
-  if (!activeSessions.empty) {
+  if (!activeSessByUid.empty || !activeSessByPlate.empty) {
     throw new HttpsError(
       "failed-precondition",
-      "Bạn đang có một phiên đỗ xe chưa hoàn tất tại bãi.",
+      "Bạn hoặc biển số xe này đang có một phiên đỗ xe chưa hoàn tất tại bãi.",
       { reason: "HAS_ACTIVE_SESSION" }
     );
   }
 
-  // 3. Kiểm tra bãi đỗ
+  // 2. Kiểm tra bãi đỗ
   const lotDoc = await lotRef.get();
   if (!lotDoc.exists) {
     throw new HttpsError("not-found", "Bãi đỗ không tồn tại.");
   }
   const lotName = lotDoc.data()?.name || "Bãi đỗ xe";
 
-  // 4. Xác định ô đỗ
-  let targetSlotId = slotId;
-  if (!targetSlotId) {
-    const availableSlotsSnapshot = await lotRef
-      .collection("slots")
-      .where("status", "==", "available")
-      .limit(1)
-      .get();
-
-    if (availableSlotsSnapshot.empty) {
-      throw new HttpsError("resource-exhausted", "Bãi đỗ hiện đã hết chỗ trống.");
-    }
-    targetSlotId = availableSlotsSnapshot.docs[0].id;
-  }
-
-  const slotRef = lotRef.collection("slots").doc(targetSlotId);
+  const requestedSlotId = slotId ? String(slotId).trim() : "";
   const resRef = db.collection("reservations").doc();
-  const txRef = db.collection("transactions").doc();
-
   const nowMs = Date.now();
   const expiresAtMs = nowMs + BUSINESS_CONFIG.HOLD_DURATION_MINUTES * 60 * 1000;
-  let balanceAfter = 0;
+  let targetSlotId = requestedSlotId;
 
   await db.runTransaction(async (transaction) => {
-    const slotDoc = await transaction.get(slotRef);
-    if (!slotDoc.exists || slotDoc.data()?.status !== "available") {
-      throw new HttpsError(
-        "resource-exhausted",
-        "Vị trí đỗ vừa được người khác chọn. Vui lòng chọn ô khác."
-      );
+    let slotRef: FirebaseFirestore.DocumentReference;
+
+    if (requestedSlotId) {
+      slotRef = lotRef.collection("slots").doc(requestedSlotId);
+      const slotDoc = await transaction.get(slotRef);
+      const sData = slotDoc.data() || {};
+      if (!slotDoc.exists || sData.status !== "available" || sData.sensorOccupied === true) {
+        throw new HttpsError(
+          "resource-exhausted",
+          "Vị trí đỗ hiện không còn trống. Vui lòng chọn ô khác.",
+          { reason: "RESOURCE_EXHAUSTED" }
+        );
+      }
+      targetSlotId = slotDoc.id;
+    } else {
+      const slotsSnap = await transaction.get(lotRef.collection("slots"));
+      const candidates = slotsSnap.docs
+        .map((d) => ({ ref: d.ref, id: d.id, data: d.data() || {} }))
+        .filter((s) => s.data.status === "available" && s.data.sensorOccupied !== true)
+        .sort((a, b) => a.id.localeCompare(b.id));
+
+      if (candidates.length === 0) {
+        throw new HttpsError("resource-exhausted", "Bãi đỗ hiện đã hết chỗ trống.", {
+          reason: "RESOURCE_EXHAUSTED",
+        });
+      }
+      targetSlotId = candidates[0].id;
+      slotRef = candidates[0].ref;
     }
 
-    const latestUserDoc = await transaction.get(userRef);
-    const currentBalance = Number(latestUserDoc.data()?.walletBalance || 0);
-    if (currentBalance < depositAmount) {
-      throw new HttpsError(
-        "failed-precondition",
-        "Số dư không đủ đặt cọc.",
-        { reason: "INSUFFICIENT_BALANCE" }
-      );
-    }
-
-    balanceAfter = currentBalance - depositAmount;
-
-    // Trừ cọc từ ví
-    transaction.update(userRef, {
-      walletBalance: balanceAfter,
-    });
-
-    // Tạo giao dịch cọc
-    transaction.set(txRef, {
-      uid,
-      type: "reservation_deposit",
-      amount: -depositAmount,
-      balanceAfter,
-      reservationId: resRef.id,
-      methodLabel: "Ví nội bộ",
-      invoiceNo: `DEP-${Date.now().toString().slice(-8)}`,
-      description: `Đặt cọc giữ chỗ ô ${targetSlotId} tại ${lotName}`,
-      createdAt: FieldValue.serverTimestamp(),
-    });
-
-    // Tạo reservation
+    // Tạo reservation (miễn cọc)
     transaction.set(resRef, {
       uid,
       lotId,
       lotName,
       slotId: targetSlotId,
-      plate: plateNormalized,
-      plateDisplay: PlateUtils.formatDisplay(plateNormalized),
+      plate: normalizedPlate,
+      plateDisplay: PlateUtils.formatDisplay(normalizedPlate),
       status: "active",
       createdAt: Timestamp.fromMillis(nowMs),
       expiresAt: Timestamp.fromMillis(expiresAtMs),
       remindedExpiring: false,
       extendCount: 0,
       maxExtendCount: BUSINESS_CONFIG.MAX_EXTEND_COUNT,
-      depositAmount,
-      depositStatus: "held",
+      depositAmount: 0,
+      depositStatus: "none",
     });
 
     // Cập nhật slot sang reserved
@@ -172,8 +142,7 @@ export const createReservation = onCall({ region: REGION }, async (request) => {
     reservationId: resRef.id,
     slotId: targetSlotId,
     expiresAtMs,
-    depositAmount,
-    balanceAfter,
+    depositAmount: 0,
   };
 });
 
@@ -190,11 +159,6 @@ export const cancelReservation = onCall({ region: REGION }, async (request) => {
 
   const db = admin.firestore();
   const resRef = db.collection("reservations").doc(reservationId);
-  const userRef = db.collection("users").doc(uid);
-
-  let refunded = false;
-  let refundAmount = 0;
-  let balanceAfter = 0;
 
   await db.runTransaction(async (transaction) => {
     const resDoc = await transaction.get(resRef);
@@ -214,72 +178,32 @@ export const cancelReservation = onCall({ region: REGION }, async (request) => {
       );
     }
 
-    const createdAtMs = resData.createdAt?.toMillis() || Date.now();
-    const elapsedSec = (Date.now() - createdAtMs) / 1000;
-    const freeCancelSec = BUSINESS_CONFIG.FREE_CANCEL_MINUTES * 60;
-
-    const userDoc = await transaction.get(userRef);
-    const currentBalance = Number(userDoc.data()?.walletBalance || 0);
-
     const slotRef = db
       .collection("lots")
       .doc(resData.lotId)
       .collection("slots")
       .doc(resData.slotId);
+    const slotDoc = await transaction.get(slotRef);
 
-    if (elapsedSec <= freeCancelSec) {
-      // Huỷ trong 2 phút -> Hoàn cọc 100%
-      refunded = true;
-      refundAmount = resData.depositAmount || BUSINESS_CONFIG.DEFAULT_DEPOSIT_AMOUNT;
-      balanceAfter = currentBalance + refundAmount;
+    transaction.update(resRef, {
+      status: "cancelled",
+      depositStatus: "none",
+      cancelledAt: FieldValue.serverTimestamp(),
+    });
 
-      transaction.update(userRef, {
-        walletBalance: balanceAfter,
-      });
-
-      const txRef = db.collection("transactions").doc();
-      transaction.set(txRef, {
-        uid,
-        type: "deposit_refund",
-        amount: refundAmount,
-        balanceAfter,
-        reservationId,
-        methodLabel: "Hoàn cọc ví",
-        invoiceNo: `REF-${Date.now().toString().slice(-8)}`,
-        description: `Hoàn cọc huỷ đặt chỗ trước 2 phút (${resData.lotName})`,
-        createdAt: FieldValue.serverTimestamp(),
-      });
-
-      transaction.update(resRef, {
-        status: "cancelled",
-        depositStatus: "refunded",
-        cancelledAt: FieldValue.serverTimestamp(),
-      });
-    } else {
-      // Huỷ sau 2 phút -> Mất cọc
-      refunded = false;
-      refundAmount = 0;
-      balanceAfter = currentBalance;
-
-      transaction.update(resRef, {
-        status: "cancelled",
-        depositStatus: "forfeited",
-        cancelledAt: FieldValue.serverTimestamp(),
+    if (slotDoc.exists && slotDoc.data()?.status === "reserved") {
+      transaction.update(slotRef, {
+        status: "available",
+        reservationId: null,
+        updatedAt: FieldValue.serverTimestamp(),
       });
     }
-
-    // Trả slot về available
-    transaction.update(slotRef, {
-      status: "available",
-      reservationId: null,
-      updatedAt: FieldValue.serverTimestamp(),
-    });
   });
 
   return {
-    refunded,
-    refundAmount,
-    balanceAfter,
+    refunded: false,
+    refundAmount: 0,
+    cancelled: true,
   };
 });
 

@@ -1,6 +1,7 @@
 import {
   callAdminOpenGate,
   callAdminCorrectPlate,
+  callAdminDismissGateEvent,
   callAdminCloseSession,
   callAdminAdjustBalance,
   callAdminRefundDeposit,
@@ -44,13 +45,60 @@ export const adminApi = {
     }
   },
 
-  async correctPlate(gateEventId: string, newPlateDisplay: string) {
+  async correctPlate(
+    gateEventId: string,
+    newPlateDisplay: string,
+    options?: {
+      sessionId?: string;
+      imageUrl?: string;
+      cropImageUrl?: string;
+      openGate?: boolean;
+    }
+  ) {
     try {
-      const res = await callAdminCorrectPlate({ gateEventId, newPlateDisplay });
+      const res = await callAdminCorrectPlate({
+        gateEventId,
+        newPlateDisplay,
+        ...(options || {}),
+      });
       return res.data;
     } catch (err) {
       throw formatError(err);
     }
+  },
+
+  async dismissGateEvent(gateEventId: string, reason?: string) {
+    try {
+      const res = await callAdminDismissGateEvent({ gateEventId, reason });
+      return res.data;
+    } catch (err) {
+      throw formatError(err);
+    }
+  },
+
+  async recaptureGate(gateEventId: string, direction: "in" | "out"): Promise<{
+    imageUrl?: string | null;
+    cropImageUrl?: string | null;
+    plateRaw: string;
+    plateNormalized: string;
+    plateDisplay: string;
+    confidence: number;
+    isValid: boolean;
+    latencyMs: number;
+  }> {
+    const res = await fetch("http://127.0.0.1:8000/debug/recapture-gate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gateEventId,
+        direction: direction.toUpperCase(),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || "Không thể chụp lại ảnh từ Camera IP.");
+    }
+    return data;
   },
 
   async closeSession(params: {

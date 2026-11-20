@@ -201,15 +201,21 @@ private fun SlotItem(
     isHighlighted: Boolean,
     onClick: (() -> Unit)?
 ) {
+    val effectiveStatus = if (slot.status == SlotStatus.OCCUPIED || slot.sensorOccupied) {
+        SlotStatus.OCCUPIED
+    } else {
+        slot.status
+    }
+
     val backgroundColor = when {
         isSelected -> SlotSelected
         isHighlighted -> SlotSelected
-        slot.status == SlotStatus.OCCUPIED -> SlotOccupied
-        slot.status == SlotStatus.RESERVED -> SlotReserved
+        effectiveStatus == SlotStatus.OCCUPIED -> SlotOccupied
+        effectiveStatus == SlotStatus.RESERVED -> SlotReserved
         else -> SlotAvailable
     }
 
-    val isClickable = onClick != null && slot.status == SlotStatus.AVAILABLE
+    val isClickable = onClick != null && effectiveStatus == SlotStatus.AVAILABLE
 
     Box(
         modifier = Modifier
@@ -237,7 +243,7 @@ private fun SlotItem(
                 ),
                 color = Color.White
             )
-            when (slot.status) {
+            when (effectiveStatus) {
                 SlotStatus.OCCUPIED -> {
                     Icon(
                         imageVector = Icons.Default.DirectionsCar,

@@ -13,9 +13,10 @@ export const BUSINESS_CONFIG = {
   DEFAULT_BLOCK_MINUTES: 60,      // 60 phút/giờ
   DEFAULT_GRACE_MINUTES: 0,       // Miễn phí nếu <= graceMinutes (khi > 0)
 
-  // Đặt chỗ & Cọc
-  DEFAULT_DEPOSIT_AMOUNT: 5000,  // Cọc 5.000đ
+  // Đặt chỗ (không sử dụng ví / không thu cọc)
+  DEFAULT_DEPOSIT_AMOUNT: 0,     // Miễn cọc đặt chỗ
   HOLD_DURATION_MINUTES: 15,     // Giữ chỗ 15 phút
+  EXIT_REQUEST_TTL_MINUTES: 5,   // Yêu cầu ra khỏi bãi có hiệu lực 5 phút
   FREE_CANCEL_MINUTES: 2,        // Huỷ trong 2 phút hoàn 100%
   MAX_EXTEND_COUNT: 1,           // Tối đa 1 lần gia hạn (+15p)
   EXTEND_DURATION_MINUTES: 15,   // Mỗi lần gia hạn +15 phút

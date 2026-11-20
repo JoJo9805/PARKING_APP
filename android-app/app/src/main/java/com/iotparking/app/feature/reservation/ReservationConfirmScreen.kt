@@ -18,10 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -52,7 +52,6 @@ import com.iotparking.app.R
 import com.iotparking.app.core.designsystem.component.ErrorDialog
 import com.iotparking.app.core.designsystem.component.LoadingOverlay
 import com.iotparking.app.core.designsystem.component.ParkingPrimaryButton
-import com.iotparking.app.core.designsystem.component.ParkingSecondaryButton
 import com.iotparking.app.core.designsystem.theme.WarningAmber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,15 +60,13 @@ fun ReservationConfirmScreen(
     viewModel: ReservationViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToActiveReservation: (String) -> Unit,
-    onNavigateToWallet: () -> Unit,
+    onNavigateToCardManagement: () -> Unit,
     onNavigateToAddVehicle: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lot = uiState.lot
-    val deposit = lot?.depositAmount ?: 5000L
-    val walletBalance = uiState.user?.walletBalance ?: 0L
-    val isInsufficientBalance = walletBalance < deposit
-    val isNegativeBalance = walletBalance < 0L
+    val isSelectedSlotUnavailable = !uiState.autoAssignSlot && uiState.selectedSlot == null && uiState.slots.isNotEmpty()
+    val canConfirm = uiState.selectedVehicle != null && (uiState.autoAssignSlot || uiState.selectedSlot != null)
 
     var vehicleDropdownExpanded by remember { mutableStateOf(false) }
 
@@ -98,16 +95,17 @@ fun ReservationConfirmScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    if (isInsufficientBalance) {
-                        ParkingSecondaryButton(
-                            text = "Nạp thêm tiền vào ví",
-                            onClick = onNavigateToWallet,
+                    if (isSelectedSlotUnavailable) {
+                        Text(
+                            text = "Ô đỗ đã chọn hiện không còn trống, vui lòng quay lại chọn ô khác.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
                     ParkingPrimaryButton(
                         text = "Xác nhận & Giữ chỗ",
-                        enabled = !isInsufficientBalance && !isNegativeBalance && uiState.selectedVehicle != null,
+                        enabled = canConfirm,
                         isLoading = uiState.isLoading,
                         onClick = viewModel::confirmReservation
                     )
@@ -151,9 +149,14 @@ fun ReservationConfirmScreen(
                     ) {
                         Text(text = "Vị trí ô đỗ:", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            text = if (uiState.autoAssignSlot) "Hệ thống tự gán" else (uiState.selectedSlot?.id ?: "Chưa chọn"),
+                            text = when {
+                                uiState.autoAssignSlot -> "Hệ thống tự gán"
+                                uiState.selectedSlot != null -> uiState.selectedSlot!!.id
+                                uiState.slots.isNotEmpty() -> "Không còn trống"
+                                else -> "Đang tải..."
+                            },
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = if (isSelectedSlotUnavailable) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                         )
                     }
 
@@ -173,9 +176,9 @@ fun ReservationConfirmScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "Tiền cọc giữ chỗ:", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = "Phí giữ chỗ:", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            text = "${deposit}đ",
+                            text = "Miễn phí",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -246,13 +249,15 @@ fun ReservationConfirmScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Số dư ví hiện tại
+            // Thẻ thanh toán ảo liên kết (Demo)
+            val linkedCard = uiState.defaultPaymentMethod
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToCardManagement),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isInsufficientBalance) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
-                    else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
                 )
             ) {
                 Row(
@@ -262,37 +267,38 @@ fun ReservationConfirmScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AccountBalanceWallet, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Số dư ví:")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = if (linkedCard != null) {
+                                    "${linkedCard.brand} •••• ${linkedCard.last4}"
+                                } else {
+                                    "Chưa liên kết thẻ thanh toán ảo"
+                                },
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Text(
+                                text = if (linkedCard != null) {
+                                    "Thẻ mặc định • Thanh toán tự động khi ra bãi (Demo)"
+                                } else {
+                                    "Chạm để liên kết thẻ demo (không bắt buộc để đặt chỗ)"
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                    Text(
-                        text = "${walletBalance}đ",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = if (isInsufficientBalance) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Quản lý thẻ",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-
-            if (isNegativeBalance) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Ví của bạn đang âm. Vui lòng nạp tiền trước khi tiếp tục.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            } else if (isInsufficientBalance) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Số dư không đủ trừ 5.000đ tiền cọc. Hãy nạp thêm.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error
-                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -316,7 +322,7 @@ fun ReservationConfirmScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "1. Hệ thống chỉ mở cổng và nhận diện giữ chỗ nếu đúng biển số xe đã chọn.\n2. Nếu hủy trong 2 phút đầu: hoàn 100% cọc.\n3. Nếu hủy sau 2 phút hoặc quá hạn 15 phút: tiền cọc sẽ không được hoàn lại.",
+                            text = "1. Hệ thống chỉ mở cổng và nhận diện giữ chỗ nếu đúng biển số xe đã chọn.\n2. Đặt chỗ hoàn toàn miễn phí và tự động giữ trong ${lot?.holdDurationMinutes ?: 15} phút.\n3. Phí đỗ xe sẽ được tính và thanh toán qua thẻ thanh toán ảo liên kết (Demo) khi xe ra bãi.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface
                         )

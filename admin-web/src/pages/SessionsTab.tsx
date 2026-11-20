@@ -159,14 +159,26 @@ export function SessionsTab({ sessions, isLoading, onSuccess, onError }: Props) 
                       {s.amountCharged !== undefined ? `${s.amountCharged.toLocaleString("vi-VN")}đ` : "-"}
                     </td>
                     <td className="py-3 px-4">
-                      <span
-                        className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                          isActive ? "bg-blue-100 text-blue-800" : "bg-emerald-100 text-emerald-800"
-                        }`}
-                      >
-                        {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                        <span>{isActive ? "Đang đỗ" : "Đã xong"}</span>
-                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span
+                          className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                            isActive ? "bg-blue-100 text-blue-800" : "bg-emerald-100 text-emerald-800"
+                          }`}
+                        >
+                          {isActive ? <Clock className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
+                          <span>{isActive ? "Đang đỗ" : "Đã xong"}</span>
+                        </span>
+                        {isActive && s.exitRequested && (
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                            Yêu cầu ra
+                          </span>
+                        )}
+                        {isActive && s.waitingAtExitGate && (
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
+                            Chờ xác nhận ở Cổng RA
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3 px-4 flex items-center space-x-2">
                       {(s.entryImageUrl || s.exitImageUrl) && (

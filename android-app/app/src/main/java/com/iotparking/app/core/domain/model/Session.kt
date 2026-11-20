@@ -23,7 +23,12 @@ data class Session(
     val entryImageUrl: String?,
     val exitImageUrl: String?,
     val flags: List<String>,
-    val transactionId: String?
+    val transactionId: String?,
+    val exitRequested: Boolean = false,
+    val exitRequestedAt: Long? = null,
+    val exitRequestExpiresAt: Long? = null,
+    val waitingAtExitGate: Boolean = false,
+    val waitingAtExitGateAt: Long? = null
 )
 
 enum class SessionStatus {

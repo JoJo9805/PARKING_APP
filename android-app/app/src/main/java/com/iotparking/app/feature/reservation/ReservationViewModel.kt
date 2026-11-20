@@ -5,13 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iotparking.app.core.data.repository.AuthRepository
 import com.iotparking.app.core.data.repository.LotRepository
+import com.iotparking.app.core.data.repository.PaymentMethodRepository
 import com.iotparking.app.core.data.repository.ReservationRepository
 import com.iotparking.app.core.data.repository.UserRepository
 import com.iotparking.app.core.data.repository.VehicleRepository
 import com.iotparking.app.core.domain.TimeOffsetProvider
 import com.iotparking.app.core.domain.model.Lot
+import com.iotparking.app.core.domain.model.PaymentMethod
 import com.iotparking.app.core.domain.model.Reservation
 import com.iotparking.app.core.domain.model.Slot
+import com.iotparking.app.core.domain.model.SlotStatus
 import com.iotparking.app.core.domain.model.User
 import com.iotparking.app.core.domain.model.Vehicle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,12 +34,10 @@ data class ReservationUiState(
     val vehicles: List<Vehicle> = emptyList(),
     val selectedVehicle: Vehicle? = null,
     val user: User? = null,
+    val defaultPaymentMethod: PaymentMethod? = null,
     val activeReservation: Reservation? = null,
     val remainingSeconds: Long = 0L,
     val isExpiredPending: Boolean = false,
-    val cancelPredictionText: String = "",
-    val isBufferZone: Boolean = false,
-    val isCancelForfeited: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successReservationId: String? = null,
@@ -49,15 +50,19 @@ class ReservationViewModel @Inject constructor(
     private val lotRepository: LotRepository,
     private val reservationRepository: ReservationRepository,
     private val vehicleRepository: VehicleRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val timeOffsetProvider: TimeOffsetProvider
 ) : ViewModel() {
 
     private val lotId: String? = savedStateHandle["lotId"]
+    private val slotIdArg: String? = savedStateHandle["slotId"]
     private val reservationId: String? = savedStateHandle["reservationId"]
 
-    private val _uiState = MutableStateFlow(ReservationUiState())
+    private val _uiState = MutableStateFlow(
+        ReservationUiState(autoAssignSlot = (slotIdArg == "auto"))
+    )
     val uiState: StateFlow<ReservationUiState> = _uiState.asStateFlow()
 
     init {
@@ -72,6 +77,14 @@ class ReservationViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUserStream(uid).collect { user ->
                 _uiState.update { it.copy(user = user) }
+            }
+        }
+
+        // Observe linked virtual payment cards (demo)
+        viewModelScope.launch {
+            paymentMethodRepository.getPaymentMethodsStream(uid).collect { methods ->
+                val defaultCard = methods.find { it.isDefault } ?: methods.firstOrNull()
+                _uiState.update { it.copy(defaultPaymentMethod = defaultCard) }
             }
         }
 
@@ -95,7 +108,25 @@ class ReservationViewModel @Inject constructor(
             }
             viewModelScope.launch {
                 lotRepository.getSlotsStream(lotId).collect { slots ->
-                    _uiState.update { it.copy(slots = slots) }
+                    _uiState.update { state ->
+                        val updatedSelectedSlot = when {
+                            slotIdArg == "auto" -> null
+                            slotIdArg != null -> slots.find {
+                                it.id == slotIdArg && it.status == SlotStatus.AVAILABLE && !it.sensorOccupied
+                            }
+                            else -> state.selectedSlot?.let { prev ->
+                                slots.find {
+                                    it.id == prev.id && it.status == SlotStatus.AVAILABLE && !it.sensorOccupied
+                                }
+                            }
+                        }
+                        val effectiveAutoAssign = if (slotIdArg == "auto") true else state.autoAssignSlot
+                        state.copy(
+                            slots = slots,
+                            selectedSlot = updatedSelectedSlot,
+                            autoAssignSlot = effectiveAutoAssign
+                        )
+                    }
                 }
             }
         }
@@ -117,7 +148,6 @@ class ReservationViewModel @Inject constructor(
                 } else {
                     _uiState.update { it.copy(activeReservation = null) }
                 }
-                updateCancelPrediction()
             }
         }
     }
@@ -136,47 +166,8 @@ class ReservationViewModel @Inject constructor(
                             isExpiredPending = remainingSec == 0L
                         )
                     }
-                    updateCancelPrediction()
                 }
                 delay(1000)
-            }
-        }
-    }
-
-    private fun updateCancelPrediction() {
-        val res = _uiState.value.activeReservation ?: return
-        viewModelScope.launch {
-            val serverNow = timeOffsetProvider.serverNow()
-            val elapsedSec = ((serverNow - res.createdAt) / 1000).coerceAtLeast(0L)
-
-            when {
-                elapsedSec < 110 -> {
-                    _uiState.update {
-                        it.copy(
-                            cancelPredictionText = "Bạn sẽ được hoàn lại 5.000đ (dự kiến)",
-                            isBufferZone = false,
-                            isCancelForfeited = false
-                        )
-                    }
-                }
-                elapsedSec in 110..130 -> {
-                    _uiState.update {
-                        it.copy(
-                            cancelPredictionText = "Bạn đang sát mốc 2 phút. Kết quả hoàn/mất cọc do hệ thống xác định khi xử lý.",
-                            isBufferZone = true,
-                            isCancelForfeited = false
-                        )
-                    }
-                }
-                else -> {
-                    _uiState.update {
-                        it.copy(
-                            cancelPredictionText = "Bạn sẽ mất phí cọc 5.000đ (dự kiến do đã quá 2 phút)",
-                            isBufferZone = false,
-                            isCancelForfeited = true
-                        )
-                    }
-                }
             }
         }
     }
@@ -217,11 +208,9 @@ class ReservationViewModel @Inject constructor(
             } else {
                 val err = result.exceptionOrNull()?.message ?: "Đặt chỗ thất bại"
                 val friendlyMessage = when (err) {
-                    "NEGATIVE_BALANCE" -> "Ví đang âm, vui lòng nạp thêm tiền để đặt chỗ."
-                    "INSUFFICIENT_BALANCE" -> "Số dư ví không đủ 5.000đ tiền cọc. Vui lòng nạp thêm."
-                    "HAS_ACTIVE_RESERVATION" -> "Bạn đang có một lượt giữ chỗ chưa hoàn tất."
-                    "HAS_ACTIVE_SESSION" -> "Bạn đang có phương tiện đỗ trong bãi, không thể đặt thêm."
-                    "RESOURCE_EXHAUSTED" -> "Chỗ đỗ này vừa có người khác đặt. Vui lòng chọn chỗ khác."
+                    "HAS_ACTIVE_RESERVATION" -> "Bạn hoặc biển số xe này đang có một lượt giữ chỗ chưa hoàn tất."
+                    "HAS_ACTIVE_SESSION" -> "Bạn hoặc biển số xe này đang có phương tiện đỗ trong bãi, không thể đặt thêm."
+                    "RESOURCE_EXHAUSTED" -> "Chỗ đỗ này vừa có người khác đặt hoặc đã có xe đỗ. Vui lòng chọn chỗ khác."
                     else -> err
                 }
                 _uiState.update { it.copy(isLoading = false, errorMessage = friendlyMessage) }
@@ -235,15 +224,12 @@ class ReservationViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val result = reservationRepository.cancelReservation(res.id)
             if (result.isSuccess) {
-                val data = result.getOrNull()
-                val refunded = data?.get("refunded") as? Boolean ?: false
-                val refundAmount = (data?.get("refundAmount") as? Number)?.toLong() ?: 0L
-                val msg = if (refunded) {
-                    "Đã hủy đặt chỗ thành công! Bạn được hoàn lại ${refundAmount}đ tiền cọc vào ví."
-                } else {
-                    "Đã hủy đặt chỗ. Tiền cọc đã bị trừ do hủy sau 2 phút."
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        cancelResultSummary = "Đã hủy đặt chỗ thành công! Ô đỗ đã được mở lại."
+                    )
                 }
-                _uiState.update { it.copy(isLoading = false, cancelResultSummary = msg) }
             } else {
                 _uiState.update { it.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.message ?: "Hủy thất bại") }
             }

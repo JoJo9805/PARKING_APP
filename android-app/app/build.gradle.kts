@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -26,7 +28,7 @@ android {
         }
 
         // Đọc Google Maps API key từ local.properties
-        val localProps = java.util.Properties().apply {
+        val localProps = Properties().apply {
             val localPropsFile = rootProject.file("local.properties")
             if (localPropsFile.exists()) {
                 localPropsFile.inputStream().use { load(it) }

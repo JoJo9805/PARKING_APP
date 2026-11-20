@@ -15,17 +15,13 @@ export const onSlotUpdated = onDocumentWritten(
     const db = admin.firestore();
     const lotRef = db.collection("lots").doc(lotId);
 
-    // Đếm số ô đỗ trống (status == "available")
-    const availableSlotsSnap = await lotRef
-      .collection("slots")
-      .where("status", "==", "available")
-      .get();
-
-    const availableSlots = availableSlotsSnap.size;
-
-    // Đếm tổng số ô đỗ
+    // Đếm tổng số ô và số ô thực sự khả dụng (status == "available" và cảm biến chưa báo có xe)
     const allSlotsSnap = await lotRef.collection("slots").get();
     const totalSlots = allSlotsSnap.size;
+    const availableSlots = allSlotsSnap.docs.filter((doc) => {
+      const d = doc.data() || {};
+      return d.status === "available" && d.sensorOccupied !== true;
+    }).length;
 
     await lotRef.update({
       availableSlots,

@@ -29,13 +29,13 @@ export const reservationCron = onSchedule(
       const maxExtendCount = Number(data.maxExtendCount || 1);
       const canExtend = extendCount < maxExtendCount;
 
-      // 1. Quá hạn giữ chỗ -> Hết hạn (tịch thu cọc nếu có giữ cọc)
+      // 1. Quá hạn giữ chỗ -> Hết hạn & giải phóng ô đỗ
       if (nowMs >= expiresAtMs) {
         const hasHeldDeposit = Number(data.depositAmount || 0) > 0 && data.depositStatus === "held";
         await db.runTransaction(async (transaction) => {
           transaction.update(doc.ref, {
             status: "expired",
-            depositStatus: hasHeldDeposit ? "forfeited" : (data.depositStatus || "none"),
+            depositStatus: hasHeldDeposit ? "forfeited" : "none",
             expiredAt: FieldValue.serverTimestamp(),
           });
 
@@ -62,11 +62,11 @@ export const reservationCron = onSchedule(
               reservationId: doc.id,
               lotName,
               slotCode,
-              depositForfeited: String(data.depositAmount || 5000),
+              depositForfeited: "0",
             },
             {
               title: "Hết hạn giữ chỗ",
-              body: `Lượt giữ chỗ ô ${slotCode} tại ${lotName} đã hết hạn. Tiền cọc đã được chuyển thành phí phạt quá hạn.`,
+              body: `Lượt giữ chỗ ô ${slotCode} tại ${lotName} đã hết hạn và ô đỗ đã được giải phóng.`,
               refId: doc.id,
             }
           );

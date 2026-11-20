@@ -1,27 +1,28 @@
 import React, { useState } from "react";
-import { GateEvent } from "../types";
+import { GateEvent, Session } from "../types";
 import { Camera, Edit3, Search } from "lucide-react";
 import { ImageLightbox } from "../components/CommonModals";
-import { adminApi } from "../api/adminApi";
+import { ManualGateModal } from "../components/ManualGateModal";
 
 interface Props {
   events: GateEvent[];
+  sessions: Session[];
   isLoading: boolean;
   onSuccess: (msg: string) => void;
   onError: (msg: string) => void;
 }
 
-export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) {
+export function GateEventsTab({ events, sessions, onSuccess, onError }: Props) {
   const [filterDirection, setFilterDirection] = useState<"all" | "in" | "out">("all");
   const [searchPlate, setSearchPlate] = useState("");
 
   // Lightbox xem ảnh
   const [lightboxEvent, setLightboxEvent] = useState<GateEvent | null>(null);
 
-  // Modal sửa biển số
+  // Modal sửa / duyệt biển số
   const [editingEvent, setEditingEvent] = useState<GateEvent | null>(null);
-  const [newPlateInput, setNewPlateInput] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const activeSessions = sessions.filter((s) => s.status === "active");
 
   const filteredEvents = events.filter((ev) => {
     const dir = (ev.direction || "").toLowerCase();
@@ -33,30 +34,6 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
     }
     return true;
   });
-
-  const handleOpenEdit = (ev: GateEvent) => {
-    setEditingEvent(ev);
-    setNewPlateInput(ev.plateDisplay || ev.plateRaw || "");
-  };
-
-  const handleSubmitEdit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingEvent || !newPlateInput.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const res = await adminApi.correctPlate(editingEvent.id, newPlateInput.trim());
-      onSuccess(
-        `Đã đính chính biển số sự kiện ${editingEvent.id} thành ${newPlateInput.trim()}` +
-          (res.sessionId ? ` (Phiên đỗ: #${res.sessionId.slice(-6)})` : "")
-      );
-      setEditingEvent(null);
-    } catch (err: any) {
-      onError(err.message || "Lỗi khi đính chính biển số.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
@@ -148,6 +125,34 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
                         <span className="font-mono font-bold text-slate-800 text-sm">
                           {evt.plateDisplay || evt.plateNormalized || evt.plateRaw || "CHƯA RÕ"}
                         </span>
+                        {evt.status === "pending_manual" && (
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                              evt.denyReason === "PLATE_NOT_IN_LOT"
+                                ? "bg-rose-100 text-rose-800"
+                                : "bg-amber-100 text-amber-800"
+                            }`}
+                          >
+                            {evt.denyReason === "PLATE_NOT_IN_LOT"
+                              ? "Không có trong bãi • Chờ duyệt"
+                              : "Chờ duyệt"}
+                          </span>
+                        )}
+                        {evt.status === "denied" && evt.denyReason === "NO_EXIT_REQUEST" && (
+                          <span className="text-[10px] bg-orange-100 text-orange-800 px-1.5 py-0.5 rounded font-semibold">
+                            Chưa yêu cầu ra
+                          </span>
+                        )}
+                        {evt.status === "error" && (
+                          <span className="text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded font-semibold">
+                            Lỗi
+                          </span>
+                        )}
+                        {evt.status === "ignored" && (
+                          <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-semibold">
+                            Đã bỏ qua
+                          </span>
+                        )}
                         {evt.isManualCorrected && (
                           <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.2 rounded font-semibold">
                             Đã sửa
@@ -182,11 +187,15 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
                     <td className="py-3 px-4">
                       <button
                         type="button"
-                        onClick={() => handleOpenEdit(evt)}
-                        className="flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded transition"
+                        onClick={() => setEditingEvent(evt)}
+                        className={`flex items-center space-x-1 font-semibold px-2.5 py-1 rounded transition ${
+                          evt.status === "pending_manual"
+                            ? "bg-amber-100 hover:bg-amber-200 text-amber-900"
+                            : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        }`}
                       >
                         <Edit3 className="w-3 h-3" />
-                        <span>Sửa biển</span>
+                        <span>{evt.status === "pending_manual" ? "Nhập biển & Mở" : "Sửa biển"}</span>
                       </button>
                     </td>
                   </tr>
@@ -208,52 +217,14 @@ export function GateEventsTab({ events, isLoading, onSuccess, onError }: Props) 
         />
       )}
 
-      {/* Modal sửa biển số xe */}
-      {editingEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800">Đính Chính Biển Số Xe</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Sự kiện: <span className="font-mono font-bold">{editingEvent.id}</span> (Hướng{" "}
-              {editingEvent.direction.toUpperCase()})
-            </p>
-
-            <form onSubmit={handleSubmitEdit} className="mt-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-                  Biển số chính xác (Ví dụ: 51A-123.45 hoặc 29C1-999.88)
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newPlateInput}
-                  onChange={(e) => setNewPlateInput(e.target.value.toUpperCase())}
-                  placeholder="51A-123.45"
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end space-x-3">
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={() => setEditingEvent(null)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow transition disabled:opacity-50"
-                >
-                  {isSubmitting ? "Đang lưu..." : "Xác nhận & Cập nhật"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Modal sửa / duyệt biển số & chụp lại */}
+      <ManualGateModal
+        event={editingEvent}
+        activeSessions={activeSessions}
+        onClose={() => setEditingEvent(null)}
+        onSuccess={onSuccess}
+        onError={onError}
+      />
     </div>
   );
 }

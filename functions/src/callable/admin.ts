@@ -7,26 +7,25 @@ import { SessionService } from "../domain/sessionService";
 import { assertAdmin } from "./_auth";
 
 /**
- * Callable adminCorrectPlate: Quản trị viên đính chính biển số xe
- * khi camera OCR nhận diện sai hoặc nhận diện thiếu.
+ * Callable adminCorrectPlate: Quản trị viên nhập/đính chính biển số (Cổng VÀO)
+ * hoặc chọn xe từ danh sách đang đỗ (Cổng RA), xử lý phiên đỗ và tự động mở barie nếu cần.
  */
 export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
   assertAdmin(request);
 
-  const { gateEventId, newPlateDisplay } = request.data || {};
+  const {
+    gateEventId,
+    newPlateDisplay,
+    sessionId: selectedSessionId,
+    imageUrl: updatedImageUrl,
+    cropImageUrl: updatedCropUrl,
+    openGate,
+  } = request.data || {};
 
-  if (!gateEventId || !newPlateDisplay) {
+  if (!gateEventId || (!newPlateDisplay && !selectedSessionId)) {
     throw new HttpsError(
       "invalid-argument",
-      "Thiếu tham số gateEventId hoặc newPlateDisplay."
-    );
-  }
-
-  const normalized = PlateUtils.normalize(newPlateDisplay);
-  if (!PlateUtils.isValid(normalized)) {
-    throw new HttpsError(
-      "invalid-argument",
-      "Biển số mới không đúng định dạng Việt Nam."
+      "Thiếu tham số gateEventId hoặc biển số / phiên đỗ xe."
     );
   }
 
@@ -41,6 +40,30 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
   const eventData = eventDoc.data() || {};
   const oldPlate = eventData.plateNormalized || "";
   const direction = (eventData.direction || "in").toLowerCase();
+  const lotId = eventData.lotId || BUSINESS_CONFIG.DEFAULT_LOT_ID;
+  const wasPendingManual =
+    eventData.status === "pending_manual" ||
+    eventData.status === "pending" ||
+    !oldPlate;
+
+  // Nếu chọn từ danh sách xe trong bãi nhưng không truyền chuỗi biển số, lấy từ session
+  let rawInputPlate = newPlateDisplay ? String(newPlateDisplay).trim() : "";
+  if (!rawInputPlate && selectedSessionId) {
+    const preSessDoc = await db.collection("sessions").doc(String(selectedSessionId)).get();
+    if (!preSessDoc.exists) {
+      throw new HttpsError("not-found", "Không tìm thấy phiên đỗ xe đã chọn.");
+    }
+    rawInputPlate = preSessDoc.data()?.plateDisplay || preSessDoc.data()?.plate || "";
+  }
+
+  const normalized = PlateUtils.normalize(rawInputPlate);
+  if (!PlateUtils.isValid(normalized)) {
+    throw new HttpsError(
+      "invalid-argument",
+      "Biển số không đúng định dạng Việt Nam (VD: 30A-123.45 hoặc 18Y-444.44)."
+    );
+  }
+  const formattedDisplay = PlateUtils.formatDisplay(normalized);
 
   // Tìm chủ xe trong bảng vehicles
   let linkedUid = "";
@@ -49,45 +72,99 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
     linkedUid = vehicleDoc.data()?.ownerUid || "";
   }
 
+  const effectiveImageUrl = updatedImageUrl || eventData.imageUrl || eventData.cropImageUrl || "";
   let sessionId = eventData.sessionId || "";
+  let assignedSlotForGate = eventData.assignedSlotId || "";
+  let closeResult: { fee: number; amountCharged: number; depositRefund: number } | null = null;
 
-  // 1. Nếu có session đang active với biển số cũ
-  if (oldPlate) {
-    const sessions = await db
-      .collection("sessions")
-      .where("status", "==", "active")
-      .where("plate", "==", oldPlate)
-      .limit(1)
-      .get();
+  if (direction === "in") {
+    // 1. Nếu đã có session active với biển số cũ -> cập nhật biển mới
+    if (oldPlate) {
+      const sessions = await db
+        .collection("sessions")
+        .where("status", "==", "active")
+        .where("plate", "==", oldPlate)
+        .limit(1)
+        .get();
 
-    if (!sessions.empty) {
-      const sDoc = sessions.docs[0];
-      sessionId = sDoc.id;
-      await sDoc.ref.update({
-        plate: normalized,
-        plateDisplay: PlateUtils.formatDisplay(normalized),
-        ...(linkedUid ? { uid: linkedUid } : {}),
-      });
+      if (!sessions.empty) {
+        const sDoc = sessions.docs[0];
+        sessionId = sDoc.id;
+        assignedSlotForGate = sDoc.data()?.actualSlotId || sDoc.data()?.assignedSlotId || assignedSlotForGate;
+        await sDoc.ref.update({
+          plate: normalized,
+          plateDisplay: formattedDisplay,
+          ...(linkedUid ? { uid: linkedUid } : {}),
+        });
+      }
     }
-  }
 
-  // 2. Fix B6: Nếu chưa có session và là sự kiện vào cổng (xe bị từ chối trước đó)
-  if (!sessionId && direction === "in") {
-    const openRes = await SessionService.openSession({
-      plateNormalized: normalized,
-      lotId: eventData.lotId || BUSINESS_CONFIG.DEFAULT_LOT_ID,
-      imageUrl: eventData.imageUrl || eventData.cropImageUrl || "",
-      assignedSlotId: eventData.assignedSlotId,
-    });
-    sessionId = openRes.sessionId;
-    linkedUid = openRes.sessionUid || linkedUid;
+    // 2. Nếu chưa có session active -> Mở phiên đỗ mới
+    if (!sessionId) {
+      const openRes = await SessionService.openSession({
+        plateNormalized: normalized,
+        lotId,
+        imageUrl: effectiveImageUrl,
+        assignedSlotId: eventData.assignedSlotId,
+      });
+      sessionId = openRes.sessionId;
+      linkedUid = openRes.sessionUid || linkedUid;
+      assignedSlotForGate = openRes.assignedSlotId || assignedSlotForGate;
+    }
+  } else if (direction === "out") {
+    // Xe RA: đóng phiên đỗ đang active theo sessionId được chọn hoặc theo biển số
+    let targetSessionId = selectedSessionId ? String(selectedSessionId) : "";
+
+    if (!targetSessionId) {
+      const activeByPlate = await db
+        .collection("sessions")
+        .where("plate", "==", normalized)
+        .where("status", "==", "active")
+        .limit(1)
+        .get();
+
+      if (!activeByPlate.empty) {
+        targetSessionId = activeByPlate.docs[0].id;
+      }
+    }
+
+    if (!targetSessionId) {
+      throw new HttpsError(
+        "failed-precondition",
+        `Không tìm thấy phiên đỗ đang hoạt động cho biển ${formattedDisplay}. Hãy chọn xe từ danh sách xe đang đỗ.`
+      );
+    }
+
+    const sDoc = await db.collection("sessions").doc(targetSessionId).get();
+    if (!sDoc.exists) {
+      throw new HttpsError("not-found", "Không tìm thấy phiên đỗ xe.");
+    }
+    if (sDoc.data()?.status === "active") {
+      const closed = await SessionService.closeSession({
+        sessionId: targetSessionId,
+        exitTimeMs: Date.now(),
+        exitImageUrl: effectiveImageUrl,
+        closedByAdmin: true,
+        closeReason: "Quản trị viên xác nhận biển số xe ra trên Web Admin",
+      });
+      closeResult = {
+        fee: closed.fee,
+        amountCharged: closed.amountCharged,
+        depositRefund: closed.depositRefund,
+      };
+    }
+    sessionId = targetSessionId;
   }
 
   // Cập nhật lại gateEvent
   await eventRef.update({
     plateNormalized: normalized,
-    plateRaw: newPlateDisplay,
-    plateDisplay: PlateUtils.formatDisplay(normalized),
+    plateRaw: rawInputPlate || formattedDisplay,
+    plateDisplay: formattedDisplay,
+    ...(updatedImageUrl ? { imageUrl: updatedImageUrl } : {}),
+    ...(updatedCropUrl ? { cropImageUrl: updatedCropUrl } : {}),
+    ...(assignedSlotForGate ? { assignedSlotId: assignedSlotForGate } : {}),
+    denyReason: FieldValue.delete(),
     isManualCorrected: true,
     correctedBy: request.auth?.uid,
     correctedAt: FieldValue.serverTimestamp(),
@@ -96,10 +173,69 @@ export const adminCorrectPlate = onCall({ region: REGION }, async (request) => {
     status: "processed",
   });
 
+  // Tự động gửi lệnh mở barie đúng cổng nếu là xử lý sự kiện chờ duyệt (hoặc openGate=true)
+  const shouldOpenGate = openGate === true || (openGate !== false && wasPendingManual);
+  let gateOpened = false;
+  if (shouldOpenGate) {
+    let deviceId = eventData.deviceId || "";
+    if (!deviceId) {
+      const lotDoc = await db.collection("lots").doc(lotId).get();
+      deviceId = lotDoc.data()?.deviceId || BUSINESS_CONFIG.DEFAULT_DEVICE_ID;
+    }
+
+    await db.collection("deviceCommands").doc().set({
+      deviceId,
+      action: "OPEN_GATE",
+      payload: {
+        direction: direction === "out" ? "out" : "in",
+        plate: formattedDisplay,
+        assignedSlot: assignedSlotForGate || "",
+        reason: direction === "out" ? "admin_manual_plate_out" : "admin_manual_plate_in",
+      },
+      status: "pending",
+      createdBy: request.auth?.uid,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    gateOpened = true;
+  }
+
   return {
     sessionId,
     linkedUid,
+    gateOpened,
+    plateDisplay: formattedDisplay,
+    assignedSlotId: assignedSlotForGate,
+    ...(closeResult || {}),
   };
+});
+
+/**
+ * Callable adminDismissGateEvent: Quản trị viên bỏ qua sự kiện chưa đọc được biển số (không mở cổng).
+ */
+export const adminDismissGateEvent = onCall({ region: REGION }, async (request) => {
+  assertAdmin(request);
+
+  const { gateEventId, reason } = request.data || {};
+  if (!gateEventId) {
+    throw new HttpsError("invalid-argument", "Thiếu gateEventId.");
+  }
+
+  const db = admin.firestore();
+  const eventRef = db.collection("gateEvents").doc(gateEventId);
+  const eventDoc = await eventRef.get();
+  if (!eventDoc.exists) {
+    throw new HttpsError("not-found", "Không tìm thấy sự kiện cổng.");
+  }
+
+  await eventRef.update({
+    status: "ignored",
+    decision: "denied",
+    denyReason: reason || "Quản trị viên từ chối / bỏ qua trên Web",
+    dismissedBy: request.auth?.uid,
+    dismissedAt: FieldValue.serverTimestamp(),
+  });
+
+  return { ok: true };
 });
 
 /**

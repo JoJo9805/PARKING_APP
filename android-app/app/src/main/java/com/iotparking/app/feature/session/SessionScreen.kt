@@ -17,13 +17,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,9 +35,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +60,7 @@ import com.iotparking.app.core.designsystem.component.LoadingOverlay
 import com.iotparking.app.core.designsystem.component.ParkingPrimaryButton
 import com.iotparking.app.core.designsystem.component.ParkingSecondaryButton
 import com.iotparking.app.core.designsystem.theme.SuccessGreen
+import com.iotparking.app.core.designsystem.theme.WarningAmber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +70,7 @@ fun SessionScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val session = uiState.session
+    var showConfirmExitDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -242,7 +251,7 @@ fun SessionScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Text(
-                                        text = "Hoàn cọc dư vào ví (dự kiến):",
+                                        text = "Hoàn cọc dư (dự kiến):",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = SuccessGreen
                                     )
@@ -253,6 +262,120 @@ fun SessionScreen(
                                     )
                                 }
                             }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Thẻ gửi yêu cầu ra khỏi bãi (Hiệu lực 5 phút hoặc tự mở ngay khi xe đang chờ ở Cổng RA)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = when {
+                            uiState.isExitRequestActive -> SuccessGreen.copy(alpha = 0.12f)
+                            uiState.isWaitingAtExitGate -> WarningAmber.copy(alpha = 0.14f)
+                            else -> MaterialTheme.colorScheme.surface
+                        }
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = if (uiState.isExitRequestActive || uiState.isWaitingAtExitGate) 0.dp else 2.dp
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        if (uiState.isExitRequestActive) {
+                            val remMin = uiState.exitRequestRemainingSeconds / 60
+                            val remSec = uiState.exitRequestRemainingSeconds % 60
+                            val remFormatted = String.format("%02d:%02d", remMin, remSec)
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = null,
+                                        tint = SuccessGreen
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Đã gửi yêu cầu ra bãi",
+                                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                        color = SuccessGreen
+                                    )
+                                }
+                                Text(
+                                    text = "Còn $remFormatted",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = SuccessGreen
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Mời lái xe đến Cổng RA để camera quét biển số và mở barie tự động.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ParkingSecondaryButton(
+                                text = "Hủy yêu cầu ra",
+                                onClick = { viewModel.cancelExitRequest() },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else if (uiState.isWaitingAtExitGate) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                    contentDescription = null,
+                                    tint = WarningAmber
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Xe đang chờ tại Cổng RA!",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = WarningAmber
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Camera Cổng RA đã nhận diện xe nhưng chưa có lệnh ra. Bấm nút bên dưới để xác nhận và tự động mở barie ngay lập tức.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ParkingPrimaryButton(
+                                text = "Xác nhận ra & Mở Cổng RA ngay",
+                                onClick = { showConfirmExitDialog = true },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Chuẩn bị rời bãi?",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Gửi yêu cầu trước khi tới Cổng RA (hiệu lực 5 phút) để hệ thống xác nhận mở barie.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            ParkingPrimaryButton(
+                                text = "Gửi yêu cầu ra khỏi bãi",
+                                onClick = { showConfirmExitDialog = true },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 }
@@ -367,6 +490,53 @@ fun SessionScreen(
         }
 
         LoadingOverlay(isLoading = uiState.isLoading)
+
+        if (showConfirmExitDialog && session != null) {
+            AlertDialog(
+                onDismissRequest = { showConfirmExitDialog = false },
+                title = {
+                    Text(if (uiState.isWaitingAtExitGate) "Xác nhận & Mở Cổng RA ngay?" else "Xác nhận ra khỏi bãi?")
+                },
+                text = {
+                    val estFee = uiState.feeResult?.fee
+                    val feeLine = if (estFee != null) "\nPhí tạm tính: ${estFee}đ" else ""
+                    val bodyText = if (uiState.isWaitingAtExitGate) {
+                        "Xe biển số ${session.plateDisplay} đang chờ tại Cổng RA. Barie Cổng RA sẽ tự động mở ngay sau khi bạn xác nhận.$feeLine"
+                    } else {
+                        "Xe biển số ${session.plateDisplay} sẽ được cấp quyền mở barie Cổng RA trong vòng 5 phút.$feeLine"
+                    }
+                    Text(bodyText)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showConfirmExitDialog = false
+                            viewModel.requestExit()
+                        }
+                    ) {
+                        Text(if (uiState.isWaitingAtExitGate) "Mở Cổng RA ngay" else "Xác nhận gửi")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showConfirmExitDialog = false }) {
+                        Text("Hủy")
+                    }
+                }
+            )
+        }
+
+        uiState.autoExitSuccessMessage?.let { successMsg ->
+            AlertDialog(
+                onDismissRequest = viewModel::clearAutoExitSuccess,
+                title = { Text("Đã mở Cổng RA") },
+                text = { Text(successMsg) },
+                confirmButton = {
+                    TextButton(onClick = viewModel::clearAutoExitSuccess) {
+                        Text("Đóng")
+                    }
+                }
+            )
+        }
 
         uiState.errorMessage?.let { error ->
             ErrorDialog(

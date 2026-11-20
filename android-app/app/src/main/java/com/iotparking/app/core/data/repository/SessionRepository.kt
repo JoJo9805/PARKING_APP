@@ -15,6 +15,8 @@ interface SessionRepository {
     fun getSessionStream(sessionId: String): Flow<Session?>
     fun getCompletedSessionsStream(uid: String): Flow<List<Session>>
     suspend fun extendPlannedDuration(sessionId: String, addMinutes: Int): Result<Map<String, Any?>>
+    suspend fun requestExit(sessionId: String): Result<Map<String, Any?>>
+    suspend fun cancelExitRequest(sessionId: String): Result<Map<String, Any?>>
 }
 
 @Singleton
@@ -77,6 +79,14 @@ class SessionRepositoryImpl @Inject constructor(
         return cloudFunctionRepository.extendPlannedDuration(sessionId, addMinutes)
     }
 
+    override suspend fun requestExit(sessionId: String): Result<Map<String, Any?>> {
+        return cloudFunctionRepository.requestExit(sessionId)
+    }
+
+    override suspend fun cancelExitRequest(sessionId: String): Result<Map<String, Any?>> {
+        return cloudFunctionRepository.cancelExitRequest(sessionId)
+    }
+
     @Suppress("UNCHECKED_CAST")
     private fun mapDocToSession(id: String, data: Map<String, Any>): Session {
         val statusStr = (data["status"] as? String)?.uppercase() ?: "ACTIVE"
@@ -105,7 +115,12 @@ class SessionRepositoryImpl @Inject constructor(
             entryImageUrl = data["entryImageUrl"] as? String,
             exitImageUrl = data["exitImageUrl"] as? String,
             flags = (data["flags"] as? List<String>) ?: emptyList(),
-            transactionId = data["transactionId"] as? String
+            transactionId = data["transactionId"] as? String,
+            exitRequested = data["exitRequested"] as? Boolean ?: false,
+            exitRequestedAt = data["exitRequestedAt"].toEpochMillis(),
+            exitRequestExpiresAt = data["exitRequestExpiresAt"].toEpochMillis(),
+            waitingAtExitGate = data["waitingAtExitGate"] as? Boolean ?: false,
+            waitingAtExitGateAt = data["waitingAtExitGateAt"].toEpochMillis()
         )
     }
 }

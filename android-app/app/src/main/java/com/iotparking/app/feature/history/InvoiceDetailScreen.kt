@@ -204,10 +204,9 @@ fun InvoiceDetailScreen(
                             )
                         }
 
-                        // Hoàn cọc dư (Standard v1.1)
                         if ((session.depositRefund ?: 0L) > 0L) {
                             InvoiceRow(
-                                label = "Hoàn cọc dư vào ví",
+                                label = "Hoàn cọc dư:",
                                 value = "+${session.depositRefund}đ",
                                 valueColor = SuccessGreen
                             )

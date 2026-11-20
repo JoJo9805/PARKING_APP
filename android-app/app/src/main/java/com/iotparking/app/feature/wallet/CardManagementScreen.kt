@@ -1,6 +1,7 @@
 package com.iotparking.app.feature.wallet
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -32,6 +34,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -54,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.iotparking.app.R
 import com.iotparking.app.core.designsystem.component.EmptyState
-import com.iotparking.app.core.designsystem.theme.PrimaryLight
 import com.iotparking.app.core.domain.model.PaymentMethod
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +91,7 @@ fun CardManagementScreen(
         if (uiState.paymentMethods.isEmpty()) {
             EmptyState(
                 title = "Chưa có thẻ nào",
-                description = "Thêm thẻ thanh toán giả lập để nạp tiền vào ví nhanh chóng.",
+                description = "Thêm thẻ thanh toán ảo để demo thanh toán tự động khi ra bãi.",
                 icon = Icons.Default.CreditCard,
                 modifier = Modifier
                     .fillMaxSize()
@@ -114,7 +116,7 @@ fun CardManagementScreen(
         }
 
         if (showAddDialog) {
-            AddCardDialog(
+            AddVirtualCardDialog(
                 onConfirm = { brand, last4, holderName, isDefault ->
                     showAddDialog = false
                     viewModel.addPaymentCard(brand, last4, holderName, isDefault)
@@ -126,7 +128,7 @@ fun CardManagementScreen(
 }
 
 @Composable
-private fun PaymentCardItem(
+internal fun PaymentCardItem(
     card: PaymentMethod,
     onSetDefault: () -> Unit,
     onDelete: () -> Unit
@@ -144,7 +146,10 @@ private fun PaymentCardItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
                 Icon(
                     imageVector = Icons.Default.CreditCard,
                     contentDescription = null,
@@ -198,23 +203,26 @@ private fun PaymentCardItem(
 }
 
 @Composable
-private fun AddCardDialog(
+internal fun AddVirtualCardDialog(
     onConfirm: (brand: String, last4: String, holderName: String, isDefault: Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     var brand by remember { mutableStateOf("Visa") }
     var last4 by remember { mutableStateOf("") }
     var holderName by remember { mutableStateOf("") }
-    var isDefault by remember { mutableStateOf(false) }
+    var isDefault by remember { mutableStateOf(true) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Thêm thẻ thanh toán giả lập") },
+        title = { Text("Thêm thẻ thanh toán ảo (Demo)") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(text = "Loại thẻ:", style = MaterialTheme.typography.labelMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("Visa", "Mastercard", "JCB").forEach { b ->
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf("Visa", "Mastercard", "JCB", "Napas").forEach { b ->
                         FilterChip(
                             selected = brand == b,
                             onClick = { brand = b },
@@ -225,7 +233,11 @@ private fun AddCardDialog(
 
                 OutlinedTextField(
                     value = last4,
-                    onValueChange = { if (it.length <= 4) last4 = it },
+                    onValueChange = { input ->
+                        if (input.length <= 4 && input.all(Char::isDigit)) {
+                            last4 = input
+                        }
+                    },
                     label = { Text("4 số cuối của thẻ") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
@@ -234,7 +246,7 @@ private fun AddCardDialog(
 
                 OutlinedTextField(
                     value = holderName,
-                    onValueChange = { holderName = it },
+                    onValueChange = { holderName = it.uppercase() },
                     label = { Text("Tên chủ thẻ (không dấu)") },
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
                     singleLine = true,
@@ -244,6 +256,18 @@ private fun AddCardDialog(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(checked = isDefault, onCheckedChange = { isDefault = it })
                     Text(text = "Đặt làm thẻ mặc định", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        brand = "Visa"
+                        last4 = "4242"
+                        holderName = "NGUYEN VAN DEMO"
+                        isDefault = true
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Tạo nhanh thẻ Demo (Visa •••• 4242)")
                 }
             }
         },

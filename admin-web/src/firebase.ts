@@ -34,11 +34,32 @@ if (import.meta.env.VITE_USE_EMULATOR === "true") {
   }
 }
 
-// 5 Callable Functions cho Admin
+// Callable Functions cho Admin
 export const callAdminCorrectPlate = httpsCallable<
-  { gateEventId: string; newPlateDisplay: string },
-  { sessionId: string; linkedUid: string }
+  {
+    gateEventId: string;
+    newPlateDisplay?: string;
+    sessionId?: string;
+    imageUrl?: string;
+    cropImageUrl?: string;
+    openGate?: boolean;
+  },
+  {
+    sessionId: string;
+    linkedUid: string;
+    gateOpened?: boolean;
+    plateDisplay?: string;
+    assignedSlotId?: string;
+    fee?: number;
+    amountCharged?: number;
+    depositRefund?: number;
+  }
 >(functions, "adminCorrectPlate");
+
+export const callAdminDismissGateEvent = httpsCallable<
+  { gateEventId: string; reason?: string },
+  { ok: boolean }
+>(functions, "adminDismissGateEvent");
 
 export const callAdminOpenGate = httpsCallable<
   { deviceId?: string; direction?: "in" | "out"; action?: "OPEN_GATE" | "CLOSE_GATE" },

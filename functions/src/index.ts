@@ -12,9 +12,14 @@ export {
   cancelReservation,
   extendReservation,
 } from "./callable/reservation";
-export { extendPlannedDuration } from "./callable/session";
+export {
+  extendPlannedDuration,
+  requestExit,
+  cancelExitRequest,
+} from "./callable/session";
 export {
   adminCorrectPlate,
+  adminDismissGateEvent,
   adminOpenGate,
   adminCloseSession,
   adminAdjustBalance,

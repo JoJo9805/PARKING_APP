@@ -250,11 +250,11 @@ fun ActiveReservationScreen(
             }
         }
 
-        // Cancel Confirmation Dialog with Buffer Zone prediction
+        // Cancel Confirmation Dialog
         if (showCancelDialog) {
             ConfirmDialog(
                 title = "Xác nhận hủy đặt chỗ?",
-                message = "${uiState.cancelPredictionText}\n\nBạn có chắc chắn muốn hủy lượt giữ chỗ này?",
+                message = "Bạn có chắc chắn muốn hủy lượt giữ chỗ ô ${res?.slotId ?: ""} này? Ô đỗ sẽ được giải phóng cho xe khác.",
                 confirmText = "Hủy đặt chỗ",
                 cancelText = "Giữ lại",
                 isDestructive = true,

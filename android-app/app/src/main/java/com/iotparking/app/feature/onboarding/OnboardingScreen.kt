@@ -25,7 +25,7 @@ import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -70,7 +70,7 @@ fun OnboardingScreen(
             descriptionRes = R.string.onboarding_desc_2
         ),
         OnboardingPage(
-            icon = Icons.Default.AccountBalanceWallet,
+            icon = Icons.Default.CreditCard,
             titleRes = R.string.onboarding_title_3,
             descriptionRes = R.string.onboarding_desc_3
         )

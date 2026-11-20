@@ -108,7 +108,7 @@ class ReservationRepositoryImpl @Inject constructor(
             remindedExpiring = data["remindedExpiring"] as? Boolean ?: false,
             extendCount = (data["extendCount"] as? Number)?.toInt() ?: 0,
             maxExtendCount = (data["maxExtendCount"] as? Number)?.toInt() ?: 1,
-            depositAmount = (data["depositAmount"] as? Number)?.toLong() ?: 5000L,
+            depositAmount = (data["depositAmount"] as? Number)?.toLong() ?: 0L,
             depositStatus = depStatus
         )
     }

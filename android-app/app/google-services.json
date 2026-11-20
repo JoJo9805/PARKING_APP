@@ -1,8 +1,8 @@
 {
   "project_info": {
     "project_number": "123456789012",
-    "project_id": "iot-parking-smart",
-    "storage_bucket": "iot-parking-smart.appspot.com"
+    "project_id": "demo-iot-parking-smart",
+    "storage_bucket": "demo-iot-parking-smart.appspot.com"
   },
   "client": [
     {
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForDevelopment123456789"
+          "current_key": "AIzaSyDummyKeyForDevelopment12345678901"
         }
       ],
       "services": {
@@ -34,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForDevelopment123456789"
+          "current_key": "AIzaSyDummyKeyForDevelopment12345678901"
         }
       ],
       "services": {

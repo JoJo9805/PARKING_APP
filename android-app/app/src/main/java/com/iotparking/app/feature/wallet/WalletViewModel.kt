@@ -4,11 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iotparking.app.core.data.repository.AuthRepository
 import com.iotparking.app.core.data.repository.PaymentMethodRepository
-import com.iotparking.app.core.data.repository.UserRepository
-import com.iotparking.app.core.data.repository.WalletRepository
 import com.iotparking.app.core.domain.model.PaymentMethod
-import com.iotparking.app.core.domain.model.Transaction
-import com.iotparking.app.core.domain.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,13 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class WalletUiState(
-    val user: User? = null,
-    val balance: Long = 0L,
-    val isNegativeBalance: Boolean = false,
     val paymentMethods: List<PaymentMethod> = emptyList(),
-    val selectedPaymentMethod: PaymentMethod? = null,
-    val transactions: List<Transaction> = emptyList(),
-    val customAmountText: String = "",
+    val defaultPaymentMethod: PaymentMethod? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null
@@ -32,9 +23,7 @@ data class WalletUiState(
 
 @HiltViewModel
 class WalletViewModel @Inject constructor(
-    private val walletRepository: WalletRepository,
     private val paymentMethodRepository: PaymentMethodRepository,
-    private val userRepository: UserRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -48,66 +37,14 @@ class WalletViewModel @Inject constructor(
     private fun loadData() {
         val uid = authRepository.currentUserId ?: return
 
-        // Observe user & wallet balance
-        viewModelScope.launch {
-            userRepository.getUserStream(uid).collect { user ->
-                _uiState.update {
-                    it.copy(
-                        user = user,
-                        balance = user?.walletBalance ?: 0L,
-                        isNegativeBalance = (user?.walletBalance ?: 0L) < 0L
-                    )
-                }
-            }
-        }
-
-        // Observe payment methods
+        // Observe linked virtual payment cards
         viewModelScope.launch {
             paymentMethodRepository.getPaymentMethodsStream(uid).collect { methods ->
+                val defaultMethod = methods.find { it.isDefault } ?: methods.firstOrNull()
                 _uiState.update { state ->
-                    val defaultMethod = methods.find { it.isDefault } ?: methods.firstOrNull()
                     state.copy(
                         paymentMethods = methods,
-                        selectedPaymentMethod = state.selectedPaymentMethod ?: defaultMethod
-                    )
-                }
-            }
-        }
-
-        // Observe transactions
-        viewModelScope.launch {
-            walletRepository.getTransactionsStream(uid).collect { txs ->
-                _uiState.update { it.copy(transactions = txs) }
-            }
-        }
-    }
-
-    fun onCustomAmountChanged(amount: String) {
-        _uiState.update { it.copy(customAmountText = amount) }
-    }
-
-    fun selectPaymentMethod(method: PaymentMethod) {
-        _uiState.update { it.copy(selectedPaymentMethod = method) }
-    }
-
-    fun topUp(amount: Long) {
-        val methodId = _uiState.value.selectedPaymentMethod?.id
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val result = walletRepository.topUpWallet(amount, methodId)
-            if (result.isSuccess) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = "Nạp thành công ${amount}đ vào ví!",
-                        customAmountText = ""
-                    )
-                }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Nạp tiền thất bại"
+                        defaultPaymentMethod = defaultMethod
                     )
                 }
             }
@@ -116,13 +53,30 @@ class WalletViewModel @Inject constructor(
 
     fun addPaymentCard(brand: String, last4: String, holderName: String, isDefault: Boolean) {
         val uid = authRepository.currentUserId ?: return
+        val effectiveDefault = isDefault || _uiState.value.paymentMethods.isEmpty()
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val result = paymentMethodRepository.addPaymentMethod(uid, brand, last4, holderName, isDefault)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            val result = paymentMethodRepository.addPaymentMethod(
+                uid = uid,
+                brand = brand,
+                last4 = last4,
+                holderName = holderName.trim().uppercase(),
+                isDefault = effectiveDefault
+            )
             if (result.isSuccess) {
-                _uiState.update { it.copy(isLoading = false, successMessage = "Thêm thẻ thành công!") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        successMessage = "Liên kết thẻ ảo thành công!"
+                    )
+                }
             } else {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Thêm thẻ thất bại") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Thêm thẻ thất bại"
+                    )
+                }
             }
         }
     }
@@ -130,14 +84,36 @@ class WalletViewModel @Inject constructor(
     fun deletePaymentCard(id: String) {
         val uid = authRepository.currentUserId ?: return
         viewModelScope.launch {
-            paymentMethodRepository.deletePaymentMethod(uid, id)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            val result = paymentMethodRepository.deletePaymentMethod(uid, id)
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isLoading = false, successMessage = "Đã xóa thẻ") }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Xóa thẻ thất bại"
+                    )
+                }
+            }
         }
     }
 
     fun setDefaultPaymentCard(id: String) {
         val uid = authRepository.currentUserId ?: return
         viewModelScope.launch {
-            paymentMethodRepository.setDefaultPaymentMethod(uid, id)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            val result = paymentMethodRepository.setDefaultPaymentMethod(uid, id)
+            if (result.isSuccess) {
+                _uiState.update { it.copy(isLoading = false, successMessage = "Đã đặt làm thẻ mặc định") }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = result.exceptionOrNull()?.message ?: "Cập nhật thẻ mặc định thất bại"
+                    )
+                }
+            }
         }
     }
 

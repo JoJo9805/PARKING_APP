@@ -101,7 +101,7 @@ fun SlotSelectionScreen(
                 slots = uiState.slots,
                 selectedSlotId = uiState.selectedSlot?.id,
                 onSlotClick = { slot ->
-                    if (slot.status == SlotStatus.AVAILABLE) {
+                    if (slot.status == SlotStatus.AVAILABLE && !slot.sensorOccupied) {
                         viewModel.selectSlot(slot)
                     }
                 }

@@ -6,6 +6,10 @@ export interface Lot {
   deviceOnline?: boolean;
   camOnline?: boolean;
   barrierOpen?: boolean;
+  barrierInOpen?: boolean;
+  barrierOutOpen?: boolean;
+  gateInState?: string;
+  gateOutState?: string;
   totalSlots: number;
   availableSlots: number;
   pricePerBlock: number;
@@ -41,11 +45,12 @@ export interface GateEvent {
   plateNormalized: string;
   plateDisplay?: string;
   confidence: number;
-  decision: "accepted" | "denied";
+  decision: "accepted" | "denied" | "pending";
   denyReason?: string;
   assignedSlotId?: string;
   matchedReservationId?: string;
-  status: "processed" | "error" | "pending";
+  status: "processed" | "error" | "pending" | "pending_manual" | "ignored" | "denied";
+  flags?: string[];
   imageUrl?: string;
   cropImageUrl?: string;
   latencyMs?: number;
@@ -77,6 +82,9 @@ export interface Session {
   transactionId?: string;
   closedByAdmin?: boolean;
   closeReason?: string;
+  exitRequested?: boolean;
+  exitRequestExpiresAt?: any;
+  waitingAtExitGate?: boolean;
 }
 
 export interface Reservation {

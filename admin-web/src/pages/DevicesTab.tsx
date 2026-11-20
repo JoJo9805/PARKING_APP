@@ -14,7 +14,10 @@ interface Props {
 }
 
 export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
-  const [confirmAction, setConfirmAction] = useState<"OPEN_GATE" | "CLOSE_GATE" | null>(null);
+  const [confirmGate, setConfirmGate] = useState<{
+    direction: "in" | "out";
+    action: "OPEN_GATE" | "CLOSE_GATE";
+  } | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [phoneCamInfo, setPhoneCamInfo] = useState<{
     online: boolean;
@@ -27,7 +30,8 @@ export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
 
   const deviceId = lot?.deviceId || "ESP32_PARKING_01";
   const isGateOnline = lot?.deviceOnline ?? false;
-  const isBarrierOpen = Boolean(lot?.barrierOpen);
+  const isBarrierInOpen = lot?.barrierInOpen ?? Boolean(lot?.barrierOpen);
+  const isBarrierOutOpen = lot?.barrierOutOpen ?? false;
 
   useEffect(() => {
     let mounted = true;
@@ -89,16 +93,17 @@ export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
   };
 
   const handleToggleBarrier = async () => {
-    if (!confirmAction) return;
+    if (!confirmGate) return;
 
     setIsSending(true);
     try {
-      const res = await adminApi.openGate(deviceId, "in", confirmAction);
-      const label = confirmAction === "CLOSE_GATE" ? "đóng" : "mở";
+      const res = await adminApi.openGate(deviceId, confirmGate.direction, confirmGate.action);
+      const actionLabel = confirmGate.action === "CLOSE_GATE" ? "đóng" : "mở";
+      const gateLabel = confirmGate.direction === "out" ? "Cổng RA" : "Cổng VÀO";
       onSuccess(
-        `Đã tạo lệnh ${label} barie thành công (Mã lệnh: #${res.commandId.slice(-6)}). Edge Server đang gửi xuống phần cứng...`
+        `Đã tạo lệnh ${actionLabel} barie ${gateLabel} thành công (Mã lệnh: #${res.commandId.slice(-6)}). Edge Server đang gửi xuống phần cứng...`
       );
-      setConfirmAction(null);
+      setConfirmGate(null);
     } catch (err: any) {
       onError(err.message || "Lỗi khi gửi lệnh điều khiển barie.");
     } finally {
@@ -127,36 +132,84 @@ export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          {isBarrierOpen ? (
-            <button
-              type="button"
-              onClick={() => setConfirmAction("CLOSE_GATE")}
-              className="flex items-center space-x-2 bg-rose-600 hover:bg-rose-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md shadow-rose-600/20 transition active:scale-[0.98]"
-            >
-              <DoorClosed className="w-5 h-5" />
-              <span>Đóng Barie Cổng</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setConfirmAction("OPEN_GATE")}
-              className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md shadow-emerald-600/20 transition active:scale-[0.98]"
-            >
-              <DoorOpen className="w-5 h-5" />
-              <span>Mở Barie Cổng</span>
-            </button>
-          )}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Cổng VÀO */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-col justify-between gap-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-slate-800 text-sm">Barie Cổng VÀO</h4>
+                <p className="text-[11px] text-slate-500 font-mono">Servo GPIO 18 • Cảm biến 34 / 35</p>
+              </div>
+              <span
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+                  isBarrierInOpen
+                    ? "bg-amber-50 text-amber-800 border-amber-200"
+                    : "bg-white text-slate-700 border-slate-200"
+                }`}
+              >
+                {isBarrierInOpen ? "ĐANG MỞ" : "ĐANG ĐÓNG"}
+              </span>
+            </div>
 
-          <span
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
-              isBarrierOpen
-                ? "bg-amber-50 text-amber-800 border-amber-200"
-                : "bg-slate-50 text-slate-700 border-slate-200"
-            }`}
-          >
-            Trạng thái Barie: {isBarrierOpen ? "ĐANG MỞ" : "ĐANG ĐÓNG"}
-          </span>
+            {isBarrierInOpen ? (
+              <button
+                type="button"
+                onClick={() => setConfirmGate({ direction: "in", action: "CLOSE_GATE" })}
+                className="w-full flex items-center justify-center space-x-2 bg-rose-600 hover:bg-rose-700 text-white px-5 py-3 rounded-xl font-bold shadow-md shadow-rose-600/20 transition active:scale-[0.98]"
+              >
+                <DoorClosed className="w-5 h-5" />
+                <span>Đóng Barie Cổng VÀO</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmGate({ direction: "in", action: "OPEN_GATE" })}
+                className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold shadow-md shadow-emerald-600/20 transition active:scale-[0.98]"
+              >
+                <DoorOpen className="w-5 h-5" />
+                <span>Mở Barie Cổng VÀO</span>
+              </button>
+            )}
+          </div>
+
+          {/* Cổng RA */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-col justify-between gap-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-slate-800 text-sm">Barie Cổng RA</h4>
+                <p className="text-[11px] text-slate-500 font-mono">Servo GPIO 19 • Cảm biến 32 / 33</p>
+              </div>
+              <span
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+                  isBarrierOutOpen
+                    ? "bg-amber-50 text-amber-800 border-amber-200"
+                    : "bg-white text-slate-700 border-slate-200"
+                }`}
+              >
+                {isBarrierOutOpen ? "ĐANG MỞ" : "ĐANG ĐÓNG"}
+              </span>
+            </div>
+
+            {isBarrierOutOpen ? (
+              <button
+                type="button"
+                onClick={() => setConfirmGate({ direction: "out", action: "CLOSE_GATE" })}
+                className="w-full flex items-center justify-center space-x-2 bg-rose-600 hover:bg-rose-700 text-white px-5 py-3 rounded-xl font-bold shadow-md shadow-rose-600/20 transition active:scale-[0.98]"
+              >
+                <DoorClosed className="w-5 h-5" />
+                <span>Đóng Barie Cổng RA</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmGate({ direction: "out", action: "OPEN_GATE" })}
+                className="w-full flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold shadow-md shadow-emerald-600/20 transition active:scale-[0.98]"
+              >
+                <DoorOpen className="w-5 h-5" />
+                <span>Mở Barie Cổng RA</span>
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs flex items-center space-x-2">
@@ -193,7 +246,7 @@ export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
           <div className="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs text-slate-600">
             <div className="flex justify-between">
               <span>Nhiệm vụ:</span>
-              <span className="font-medium">Quản lý Servo cổng, 4 cảm biến ô đỗ, LCD & OLED</span>
+              <span className="font-medium">Quản lý 2 Servo cổng vào/ra, 4 cảm biến cổng, 4 ô đỗ, LCD & OLED</span>
             </div>
             <div className="flex justify-between">
               <span>Giao thức:</span>
@@ -335,18 +388,22 @@ export function DevicesTab({ lot, commands, onSuccess, onError }: Props) {
 
       {/* Modal xác nhận mở/đóng cổng */}
       <ConfirmModal
-        isOpen={!!confirmAction}
-        title={confirmAction === "CLOSE_GATE" ? "Xác nhận đóng Barie?" : "Xác nhận mở Barie khẩn cấp?"}
-        message={
-          confirmAction === "CLOSE_GATE"
-            ? `Bạn có chắc chắn muốn gửi lệnh ĐÓNG Barie tới thiết bị ${deviceId}?`
-            : `Bạn có chắc chắn muốn gửi lệnh MỞ Barie tới thiết bị ${deviceId}? Thanh chắn sẽ được nâng lên lập tức.`
+        isOpen={!!confirmGate}
+        title={
+          confirmGate?.action === "CLOSE_GATE"
+            ? `Xác nhận đóng Barie ${confirmGate?.direction === "out" ? "Cổng RA" : "Cổng VÀO"}?`
+            : `Xác nhận mở Barie ${confirmGate?.direction === "out" ? "Cổng RA" : "Cổng VÀO"}?`
         }
-        confirmText={confirmAction === "CLOSE_GATE" ? "Đóng Barie Ngay" : "Mở Barie Ngay"}
+        message={
+          confirmGate?.action === "CLOSE_GATE"
+            ? `Bạn có chắc chắn muốn gửi lệnh ĐÓNG Barie ${confirmGate?.direction === "out" ? "Cổng RA" : "Cổng VÀO"} tới thiết bị ${deviceId}?`
+            : `Bạn có chắc chắn muốn gửi lệnh MỞ Barie ${confirmGate?.direction === "out" ? "Cổng RA" : "Cổng VÀO"} tới thiết bị ${deviceId}? Thanh chắn sẽ được nâng lên lập tức.`
+        }
+        confirmText={confirmGate?.action === "CLOSE_GATE" ? "Đóng Barie Ngay" : "Mở Barie Ngay"}
         cancelText="Đóng"
         isLoading={isSending}
         onConfirm={handleToggleBarrier}
-        onClose={() => setConfirmAction(null)}
+        onClose={() => setConfirmGate(null)}
       />
     </div>
   );
