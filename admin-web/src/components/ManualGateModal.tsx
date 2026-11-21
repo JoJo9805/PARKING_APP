@@ -36,6 +36,7 @@ export function ManualGateModal({
   const [isRecapturing, setIsRecapturing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const activeSessionsRef = useRef(activeSessions);
   activeSessionsRef.current = activeSessions;
@@ -64,6 +65,7 @@ export function ManualGateModal({
     setPreviewImageUrl(event.imageUrl || "");
     setPreviewCropUrl(event.cropImageUrl || "");
     setRecaptureMsg(null);
+    setActionError(null);
   }, [event?.id]);
 
   // Đồng bộ URL ảnh nếu background recapture từ Edge vừa cập nhật lên gateEvent
@@ -177,16 +179,19 @@ export function ManualGateModal({
   const handleSelectSession = (s: Session) => {
     setSelectedSessionId(s.id);
     setPlateInput(s.plateDisplay || s.plate || "");
+    setActionError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setActionError(null);
     if (!plateInput.trim() && !selectedSessionId) {
-      onError(
+      const msg =
         dir === "out"
           ? "Vui lòng chọn xe từ danh sách trong bãi hoặc nhập biển số."
-          : "Vui lòng nhập biển số xe."
-      );
+          : "Vui lòng nhập biển số xe.";
+      setActionError(msg);
+      onError(msg);
       return;
     }
 
@@ -219,13 +224,16 @@ export function ManualGateModal({
       }
       onClose();
     } catch (err: any) {
-      onError(err.message || "Lỗi khi xác nhận biển số xe.");
+      const msg = err.message || "Lỗi khi xác nhận biển số xe.";
+      setActionError(msg);
+      onError(msg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDismiss = async () => {
+    setActionError(null);
     setIsDismissing(true);
     try {
       await adminApi.dismissGateEvent(event.id);
@@ -236,7 +244,9 @@ export function ManualGateModal({
       );
       onClose();
     } catch (err: any) {
-      onError(err.message || "Lỗi khi bỏ qua sự kiện.");
+      const msg = err.message || "Lỗi khi bỏ qua sự kiện.";
+      setActionError(msg);
+      onError(msg);
     } finally {
       setIsDismissing(false);
     }
@@ -513,6 +523,7 @@ export function ManualGateModal({
               onChange={(e) => {
                 setPlateInput(e.target.value.toUpperCase());
                 if (selectedSessionId) setSelectedSessionId("");
+                if (actionError) setActionError(null);
               }}
               placeholder="VD: 18Y-444.44"
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-base font-mono font-bold text-slate-900 uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -533,6 +544,13 @@ export function ManualGateModal({
               )
             )}
           </div>
+
+          {actionError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800 flex items-start space-x-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+              <span>{actionError}</span>
+            </div>
+          )}
 
           {/* Footer Buttons */}
           <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">

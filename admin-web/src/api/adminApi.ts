@@ -10,7 +10,7 @@ import {
 } from "../firebase";
 
 function formatError(err: any): Error {
-  const code = err?.code || "";
+  const code = String(err?.code || "").replace(/^functions\//, "");
   const details = err?.details || {};
   let message = err?.message || "Đã xảy ra lỗi không xác định.";
 
@@ -19,7 +19,13 @@ function formatError(err: any): Error {
   } else if (code === "unauthenticated") {
     message = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
   } else if (code === "not-found") {
-    message = "Không tìm thấy dữ liệu yêu cầu trên hệ thống.";
+    const rawMsg = typeof err?.message === "string" ? err.message.trim() : "";
+    if (rawMsg && rawMsg.toLowerCase() !== "not-found" && rawMsg.toUpperCase() !== "NOT_FOUND") {
+      message = rawMsg;
+    } else {
+      message =
+        "Không tìm thấy dữ liệu hoặc Cloud Function yêu cầu (hãy đảm bảo đã build và khởi động lại Firebase Emulator).";
+    }
   } else if (code === "failed-precondition") {
     if (details.reason === "NEGATIVE_BALANCE") {
       message = "Ví của người dùng đang bị âm tiền.";

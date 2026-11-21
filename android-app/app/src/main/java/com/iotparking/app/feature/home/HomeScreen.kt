@@ -199,9 +199,11 @@ fun HomeScreen(
 
                 // Active Session Banner
                 uiState.activeSession?.let { session ->
+                    val slotLabel = session.actualSlotId?.takeIf { it.isNotBlank() }
+                        ?: session.assignedSlotId?.takeIf { it.isNotBlank() }
                     ActiveBanner(
                         title = "Xe đang đỗ tại ${session.lotName}",
-                        subtitle = "Ô đỗ ${session.actualSlotId ?: session.assignedSlotId ?: ""} • Chạm để xem",
+                        subtitle = if (slotLabel != null) "Ô đỗ $slotLabel • Chạm để xem" else "Biển số ${session.plateDisplay} • Chạm để xem",
                         isReservation = false,
                         onClick = { onNavigateToActiveSession(session.id) }
                     )

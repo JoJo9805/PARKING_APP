@@ -62,6 +62,29 @@ export const addVehicle = onCall({ region: REGION }, async (request) => {
     }, { merge: true });
   }
 
+  // Tự động liên kết các phiên đỗ / giữ chỗ đang hoạt động trùng biển số chưa gắn chủ xe
+  const orphanSessionsSnap = await db
+    .collection("sessions")
+    .where("plate", "==", normalized)
+    .where("status", "==", "active")
+    .get();
+  for (const sDoc of orphanSessionsSnap.docs) {
+    if (!sDoc.data()?.uid) {
+      await sDoc.ref.update({ uid });
+    }
+  }
+
+  const orphanResSnap = await db
+    .collection("reservations")
+    .where("plate", "==", normalized)
+    .where("status", "==", "active")
+    .get();
+  for (const rDoc of orphanResSnap.docs) {
+    if (!rDoc.data()?.uid) {
+      await rDoc.ref.update({ uid });
+    }
+  }
+
   return {
     plateNormalized: normalized,
     plateDisplay: formattedDisplay,

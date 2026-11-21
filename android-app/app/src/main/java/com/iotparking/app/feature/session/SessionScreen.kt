@@ -143,7 +143,8 @@ fun SessionScreen(
                             }
                         }
 
-                        val slotId = session.actualSlotId ?: session.assignedSlotId ?: "A1"
+                        val slotId = session.actualSlotId?.takeIf { it.isNotBlank() }
+                            ?: session.assignedSlotId?.takeIf { it.isNotBlank() }
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
@@ -151,7 +152,7 @@ fun SessionScreen(
                                 .padding(horizontal = 14.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "Ô $slotId",
+                                text = if (slotId != null) "Ô $slotId" else "Tự do",
                                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                                 color = Color.White
                             )
@@ -380,36 +381,39 @@ fun SessionScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                // Chỉ dẫn đường đi từ cổng vào ô đỗ (chỉ hiện khi có ô đỗ được gán)
+                val actualSlot = session.actualSlotId?.takeIf { it.isNotBlank() }
+                    ?: session.assignedSlotId?.takeIf { it.isNotBlank() }
+                if (actualSlot != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Chỉ dẫn đường đi từ cổng vào ô đỗ
-                val actualSlot = session.actualSlotId ?: session.assignedSlotId ?: "A1"
-                val isZoneA = actualSlot.startsWith("A", ignoreCase = true)
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    val isZoneA = actualSlot.startsWith("A", ignoreCase = true)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
-                        Icon(
-                            imageVector = if (isZoneA) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text(
-                                text = "Vị trí ô đỗ: $actualSlot",
-                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = if (isZoneA) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
                             )
-                            Text(
-                                text = if (isZoneA) "Từ cổng barie, rẽ trái để vào Khu A" else "Từ cổng barie, rẽ phải để vào Khu B",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = "Vị trí ô đỗ: $actualSlot",
+                                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                                )
+                                Text(
+                                    text = if (isZoneA) "Từ cổng barie, rẽ trái để vào Khu A" else "Từ cổng barie, rẽ phải để vào Khu B",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }

@@ -14,11 +14,16 @@ import com.iotparking.app.core.location.LocationService
 import com.iotparking.app.core.location.UserLocation
 import com.iotparking.app.core.network.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -50,6 +55,7 @@ data class HomeUiState(
     val isLoading: Boolean = false
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val lotRepository: LotRepository,
@@ -90,16 +96,29 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun observeUserActivities() {
-        val uid = authRepository.currentUserId ?: return
+        val uidFlow = authRepository.currentUser
+            .map { it?.uid }
+            .distinctUntilChanged()
+
         viewModelScope.launch {
-            reservationRepository.getActiveReservationStream(uid).collect { res ->
-                _uiState.update { it.copy(activeReservation = res) }
-            }
+            uidFlow
+                .flatMapLatest { uid ->
+                    if (uid == null) flowOf(null)
+                    else reservationRepository.getActiveReservationStream(uid)
+                }
+                .collect { res ->
+                    _uiState.update { it.copy(activeReservation = res) }
+                }
         }
         viewModelScope.launch {
-            sessionRepository.getActiveSessionStream(uid).collect { session ->
-                _uiState.update { it.copy(activeSession = session) }
-            }
+            uidFlow
+                .flatMapLatest { uid ->
+                    if (uid == null) flowOf(null)
+                    else sessionRepository.getActiveSessionStream(uid)
+                }
+                .collect { session ->
+                    _uiState.update { it.copy(activeSession = session) }
+                }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.iotparking.app.core.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.iotparking.app.core.domain.model.Session
@@ -29,16 +30,23 @@ class SessionRepositoryImpl @Inject constructor(
         val query = firestore.collection("sessions")
             .whereEqualTo("uid", uid)
             .whereEqualTo("status", "active")
-            .limit(1)
 
         val registration = query.addSnapshotListener { snapshot, error ->
-            if (error != null || snapshot == null || snapshot.isEmpty) {
+            if (error != null) {
+                Log.e("SessionRepository", "getActiveSessionStream error", error)
                 trySend(null)
                 return@addSnapshotListener
             }
-            val doc = snapshot.documents.first()
-            val session = mapDocToSession(doc.id, doc.data ?: return@addSnapshotListener)
-            trySend(session)
+            if (snapshot == null || snapshot.isEmpty) {
+                trySend(null)
+                return@addSnapshotListener
+            }
+            val latestSession = snapshot.documents
+                .mapNotNull { doc ->
+                    mapDocToSession(doc.id, doc.data ?: return@mapNotNull null)
+                }
+                .maxByOrNull { it.entryTime }
+            trySend(latestSession)
         }
         awaitClose { registration.remove() }
     }
@@ -46,7 +54,12 @@ class SessionRepositoryImpl @Inject constructor(
     override fun getSessionStream(sessionId: String): Flow<Session?> = callbackFlow {
         val registration = firestore.collection("sessions").document(sessionId)
             .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null || !snapshot.exists()) {
+                if (error != null) {
+                    Log.e("SessionRepository", "getSessionStream($sessionId) error", error)
+                    trySend(null)
+                    return@addSnapshotListener
+                }
+                if (snapshot == null || !snapshot.exists()) {
                     trySend(null)
                     return@addSnapshotListener
                 }
@@ -63,7 +76,12 @@ class SessionRepositoryImpl @Inject constructor(
             .orderBy("exitTime", Query.Direction.DESCENDING)
 
         val registration = query.addSnapshotListener { snapshot, error ->
-            if (error != null || snapshot == null) {
+            if (error != null) {
+                Log.e("SessionRepository", "getCompletedSessionsStream error", error)
+                trySend(emptyList())
+                return@addSnapshotListener
+            }
+            if (snapshot == null) {
                 trySend(emptyList())
                 return@addSnapshotListener
             }

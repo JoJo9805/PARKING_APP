@@ -36,6 +36,15 @@ export const onGateEventCreated = onDocumentCreated(
     const db = admin.firestore();
 
     if (direction === "in") {
+      if (data.status === "pending_manual" || data.decision === "WAIT_MANUAL") {
+        await snap.ref.update({
+          decision: "pending",
+          status: "pending_manual",
+          denyReason: data.denyReason || "UNRECOGNIZED_PLATE",
+        });
+        return;
+      }
+
       try {
         const openResult = await SessionService.openSession({
           plateNormalized,

@@ -98,8 +98,8 @@ export class SessionService {
       }
     }
 
-    // 2. Nếu vào tự do: tìm chủ xe trong vehicles (tạm tắt tự gán ô khi xe vào)
-    if (!matchedReservationId) {
+    // 2. Nếu chưa xác định được chủ xe (vào tự do hoặc giữ chỗ tạo từ Admin): tìm chủ xe trong vehicles
+    if (!sessionUid) {
       const vehicleDoc = await db.collection("vehicles").doc(plateNormalized).get();
       if (vehicleDoc.exists) {
         sessionUid = vehicleDoc.data()?.ownerUid || null;
@@ -145,15 +145,15 @@ export class SessionService {
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    // 5. Cập nhật slot sang occupied (xóa reservationId nếu vừa vào từ đặt chỗ)
+    // 5. Giải phóng khóa đặt chỗ trên slot về available; trạng thái đã đỗ do cảm biến vật lý (sensorOccupied) quyết định
     if (assignedSlotId) {
       await lotRef
         .collection("slots")
         .doc(assignedSlotId)
         .set(
           {
-            status: "occupied",
-            sessionId: sessionRef.id,
+            status: "available",
+            sessionId: null,
             reservationId: null,
             updatedAt: FieldValue.serverTimestamp(),
           },
@@ -327,7 +327,7 @@ export class SessionService {
         ...(params.closedByAdmin ? { closedByAdmin: true, closeReason: params.closeReason || "Admin manual close" } : {}),
       });
 
-      // Giải phóng slot
+      // Giải phóng trạng thái đặt/phiên trên slot (giữ nguyên sensorOccupied theo cảm biến vật lý)
       if (slotIdToFree && lotId) {
         const slotRef = db.collection("lots").doc(lotId).collection("slots").doc(slotIdToFree);
         transaction.set(
@@ -336,7 +336,6 @@ export class SessionService {
             status: "available",
             sessionId: null,
             reservationId: null,
-            sensorOccupied: false,
             updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true }

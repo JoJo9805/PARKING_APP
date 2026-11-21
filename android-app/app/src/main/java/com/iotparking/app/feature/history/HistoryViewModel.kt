@@ -9,9 +9,14 @@ import com.iotparking.app.core.data.repository.VehicleRepository
 import com.iotparking.app.core.domain.model.Session
 import com.iotparking.app.core.domain.model.Vehicle
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -39,6 +44,7 @@ data class HistoryUiState(
     val isLoading: Boolean = true
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -56,7 +62,9 @@ class HistoryViewModel @Inject constructor(
     }
 
     private fun loadData() {
-        val uid = authRepository.currentUserId ?: return
+        val uidFlow = authRepository.currentUser
+            .map { it?.uid }
+            .distinctUntilChanged()
 
         // Load specific session if sessionId is provided (for InvoiceDetail)
         if (sessionId != null) {
@@ -69,28 +77,38 @@ class HistoryViewModel @Inject constructor(
 
         // Load vehicles
         viewModelScope.launch {
-            vehicleRepository.getVehiclesStream(uid).collect { vehicles ->
-                _uiState.update { it.copy(vehicles = vehicles) }
-            }
+            uidFlow
+                .flatMapLatest { uid ->
+                    if (uid == null) flowOf(emptyList())
+                    else vehicleRepository.getVehiclesStream(uid)
+                }
+                .collect { vehicles ->
+                    _uiState.update { it.copy(vehicles = vehicles) }
+                }
         }
 
         // Load completed sessions
         viewModelScope.launch {
-            sessionRepository.getCompletedSessionsStream(uid).collect { sessions ->
-                _uiState.update { state ->
-                    val filtered = applyFilter(sessions, state.selectedVehiclePlate, state.selectedMonthYear)
-                    val stats = calculateStats(sessions)
-                    state.copy(
-                        sessions = sessions,
-                        filteredSessions = filtered,
-                        monthlyStats = stats.monthlySpending,
-                        totalTrips = sessions.size,
-                        totalSpent = sessions.sumOf { it.amountCharged ?: it.fee ?: 0L },
-                        averageDurationMinutes = if (sessions.isNotEmpty()) sessions.sumOf { it.durationMin ?: 0 } / sessions.size else 0,
-                        isLoading = false
-                    )
+            uidFlow
+                .flatMapLatest { uid ->
+                    if (uid == null) flowOf(emptyList())
+                    else sessionRepository.getCompletedSessionsStream(uid)
                 }
-            }
+                .collect { sessions ->
+                    _uiState.update { state ->
+                        val filtered = applyFilter(sessions, state.selectedVehiclePlate, state.selectedMonthYear)
+                        val stats = calculateStats(sessions)
+                        state.copy(
+                            sessions = sessions,
+                            filteredSessions = filtered,
+                            monthlyStats = stats.monthlySpending,
+                            totalTrips = sessions.size,
+                            totalSpent = sessions.sumOf { it.amountCharged ?: it.fee ?: 0L },
+                            averageDurationMinutes = if (sessions.isNotEmpty()) sessions.sumOf { it.durationMin ?: 0 } / sessions.size else 0,
+                            isLoading = false
+                        )
+                    }
+                }
         }
     }
 

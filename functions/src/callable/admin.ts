@@ -608,27 +608,33 @@ export const adminCancelReservation = onCall({ region: REGION }, async (request)
     const depositAmount = Number(data.depositAmount || 0);
     const shouldRefund = Boolean(uid && depositAmount > 0 && data.depositStatus === "held");
 
-    let newBalance = 0;
-    if (shouldRefund) {
-      const userRef = db.collection("users").doc(uid);
-      const userDoc = await transaction.get(userRef);
-      if (userDoc.exists) {
-        const currentBal = Number(userDoc.data()?.walletBalance || 0);
-        newBalance = currentBal + depositAmount;
-        transaction.update(userRef, { walletBalance: newBalance });
+    // Thực hiện toàn bộ thao tác đọc trước khi ghi theo quy tắc Firestore Transaction
+    const userRef = shouldRefund ? db.collection("users").doc(uid) : null;
+    const userDoc = userRef ? await transaction.get(userRef) : null;
 
-        const txRef = db.collection("transactions").doc();
-        transaction.set(txRef, {
-          uid,
-          type: "deposit_refund",
-          amount: depositAmount,
-          balanceAfter: newBalance,
-          reservationId,
-          description: reason || "Quản trị viên hủy giữ chỗ & hoàn cọc",
-          createdAt: FieldValue.serverTimestamp(),
-        });
-        refundedAmount = depositAmount;
-      }
+    const slotRef =
+      data.lotId && data.slotId
+        ? db.collection("lots").doc(data.lotId).collection("slots").doc(data.slotId)
+        : null;
+    const slotDoc = slotRef ? await transaction.get(slotRef) : null;
+
+    let newBalance = 0;
+    if (shouldRefund && userRef && userDoc && userDoc.exists) {
+      const currentBal = Number(userDoc.data()?.walletBalance || 0);
+      newBalance = currentBal + depositAmount;
+      transaction.update(userRef, { walletBalance: newBalance });
+
+      const txRef = db.collection("transactions").doc();
+      transaction.set(txRef, {
+        uid,
+        type: "deposit_refund",
+        amount: depositAmount,
+        balanceAfter: newBalance,
+        reservationId,
+        description: reason || "Quản trị viên hủy giữ chỗ & hoàn cọc",
+        createdAt: FieldValue.serverTimestamp(),
+      });
+      refundedAmount = depositAmount;
     }
 
     transaction.update(resRef, {
@@ -638,14 +644,8 @@ export const adminCancelReservation = onCall({ region: REGION }, async (request)
       cancelledAt: FieldValue.serverTimestamp(),
     });
 
-    if (data.lotId && data.slotId) {
+    if (slotRef && slotDoc) {
       freedSlotId = data.slotId;
-      const slotRef = db
-        .collection("lots")
-        .doc(data.lotId)
-        .collection("slots")
-        .doc(data.slotId);
-      const slotDoc = await transaction.get(slotRef);
       if (slotDoc.exists && slotDoc.data()?.status === "reserved") {
         transaction.update(slotRef, {
           status: "available",

@@ -2,7 +2,7 @@ WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
 WARNING: sun.misc.Unsafe::allocateMemory has been called by io.netty.util.internal.PlatformDependent0$2 (file:/C:/Users/Meldyy/.cache/firebase/emulators/cloud-firestore-emulator-v1.22.0.jar)
 WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$2
 WARNING: sun.misc.Unsafe::allocateMemory will be removed in a future release
-Nov 20, 2026 6:08:57 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+Nov 21, 2026 8:38:57 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
 INFO: Started WebSocket server on ws://0.0.0.0:9150
 
 API endpoint: http://0.0.0.0:8080
@@ -20,165 +20,81 @@ If you are running a Firestore in Datastore Mode project, run:
 Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
 Dev App Server is now running.
 
-Nov 20, 2026 6:09:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:00 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:09:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:03 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:09:02 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:02 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:02 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:02 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:03 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:09:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:08 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:06 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:08 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:09:46 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:08 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:39:10 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:39:11 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:39:13 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:09:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:09:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:10:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:18 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:10:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:39:57 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:10:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:40:43 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:11:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:11:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:12:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:12:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:13:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:13:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:13:46 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:41:10 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:13:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:41:33 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:13:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:14:40 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:41:52 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Nov 20, 2026 6:14:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:14:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:15:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:42:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Nov 20, 2026 6:15:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:42:23 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:15:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:16:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:16:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:16:59 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:42:24 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Nov 20, 2026 6:17:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:17:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:18:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:18:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:19:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:19:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:19:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:19:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:20:00 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:42:52 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID iot-parking-smart, but the emulator is configured for demo-iot-parking-smart. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Nov 20, 2026 6:20:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:43:13 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:20:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:21:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:21:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:22:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:22:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:23:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:23:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:24:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:24:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:44:02 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:24:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:44:02 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:25:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:44:47 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:26:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:45:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:27:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:46:24 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:28:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:47:14 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:29:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:48:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:29:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:48:51 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:30:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:49:08 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Nov 21, 2026 8:49:37 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:31:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:50:21 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Nov 21, 2026 8:50:24 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:32:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:51:14 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:33:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:52:02 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:34:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:52:47 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:34:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:53:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:35:41 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 8:54:24 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:36:31 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:37:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:38:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:39:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:39:52 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:40:42 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:41:32 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:42:22 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:42:28 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 8:55:38 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -197,7 +113,63 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:42:34 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 8:55:50 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:55:50 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:55:50 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:56:37 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:57:24 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:58:14 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:59:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 8:59:52 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:00:44 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:01:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:02:24 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:03:14 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:04:04 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:04:54 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:05:44 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:06:35 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:07:25 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:08:15 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:09:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:09:55 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:10:45 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:11:35 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:12:25 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:13:15 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:14:05 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:14:54 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:15:45 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:16:35 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:16:51 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -216,7 +188,9 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:42:34 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 9:17:13 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Nov 21, 2026 9:17:16 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -235,7 +209,11 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:42:34 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 9:17:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Nov 21, 2026 9:17:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:17:37 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -254,7 +232,11 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:42:34 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 9:17:55 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Nov 21, 2026 9:19:12 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:19:12 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -273,11 +255,19 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:42:34 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:19:13 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:19:13 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:19:38 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:42:36 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:42:38 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 9:20:08 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:20:57 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:21:48 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:22:10 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -296,7 +286,11 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:43:14 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
+Nov 21, 2026 9:22:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Nov 21, 2026 9:22:34 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:23:13 AM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
 WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
 java.net.SocketException: Connection reset
 	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
@@ -315,775 +309,41 @@ java.net.SocketException: Connection reset
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:1527)
 
-Nov 20, 2026 6:43:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:23:32 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:43:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:23:32 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:43:22 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 6:43:22 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:24:22 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:25:12 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:26:00 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:26:47 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:27:33 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:28:22 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:29:12 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:30:02 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:30:52 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Nov 21, 2026 9:31:23 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:43:22 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 6:43:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:43:26 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 6:43:27 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:43:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:44:07 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:31:42 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:44:33 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 6:44:57 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:32:32 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:45:47 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:33:22 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:46:37 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:34:12 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:47:26 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:47:26 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:35:02 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:47:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 6:48:17 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:35:52 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:49:07 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:49:57 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:50:47 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 6:51:37 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 7:03:26 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:14:09 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:14:27 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:16:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:16:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:12 PM com.google.cloud.datastore.emulator.firestore.webchannel.FirestoreV1WebChannelAdapter$FirestoreListenHandler onClose
-INFO: channel closed
-Nov 20, 2026 9:16:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:14 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:14 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:14 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:18 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:16:43 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:16:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:16:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:17:12 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:17:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:17:38 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:18:27 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:18:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:19:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:20:10 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:21:00 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:21:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:22:40 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:23:30 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:24:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:25:08 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:26:00 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:26:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:27:40 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:28:29 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:29:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:30:10 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:31:00 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:31:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:32:19 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:32:27 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:33 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:32:33 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:32:33 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:32:34 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:36 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:40 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:32:42 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:32:42 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:32:47 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:33:16 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:33:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:33:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:33:23 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:33:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:33:30 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:33:36 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:33:38 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:34:06 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:34:14 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:34:17 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:34:19 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:34:19 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:34:22 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:34:23 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:34:25 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:35:13 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:36:03 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:36:53 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:37:43 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:38:33 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:38:46 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:38:52 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:38:57 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:38:59 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:38:59 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:39:04 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:39:06 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:39:11 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:39:21 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:39:38 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:39:44 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:39:45 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:39:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:39:52 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:39:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:40:05 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:40:05 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:40:23 PM io.netty.channel.DefaultChannelPipeline onUnhandledInboundException
-WARNING: An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-java.net.SocketException: Connection reset
-	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:398)
-	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:430)
-	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:488)
-	at io.netty.buffer.PooledByteBuf.setBytes(PooledByteBuf.java:255)
-	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1132)
-	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:356)
-	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:156)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:796)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:732)
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:658)
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:998)
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-	at java.base/java.lang.Thread.run(Thread.java:1527)
-
-Nov 20, 2026 9:40:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:41:48 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:42:38 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:42:45 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:42:45 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:43:01 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:43:38 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:43:46 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:44:28 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:44:51 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:45:00 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:45:18 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Nov 20, 2026 9:45:42 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected HTTP/2 connection.
-Nov 20, 2026 9:46:08 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Nov 21, 2026 9:36:43 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.

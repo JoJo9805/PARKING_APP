@@ -13,10 +13,16 @@ import com.iotparking.app.core.domain.model.Lot
 import com.iotparking.app.core.domain.model.Session
 import com.iotparking.app.core.domain.model.SessionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,6 +41,7 @@ data class SessionUiState(
     val errorMessage: String? = null
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SessionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -47,6 +54,8 @@ class SessionViewModel @Inject constructor(
     private val sessionId: String? = savedStateHandle["sessionId"]
     private val _uiState = MutableStateFlow(SessionUiState())
     val uiState: StateFlow<SessionUiState> = _uiState.asStateFlow()
+    private var lotObserverJob: Job? = null
+    private var observedLotId: String? = null
 
     init {
         observeSession()
@@ -54,21 +63,46 @@ class SessionViewModel @Inject constructor(
     }
 
     private fun observeSession() {
-        val uid = authRepository.currentUserId ?: return
         viewModelScope.launch {
             if (sessionId != null) {
                 sessionRepository.getSessionStream(sessionId).collect { session ->
                     handleSessionUpdate(session)
                 }
             } else {
-                sessionRepository.getActiveSessionStream(uid).collect { session ->
-                    handleSessionUpdate(session)
-                }
+                authRepository.currentUser
+                    .map { it?.uid }
+                    .distinctUntilChanged()
+                    .flatMapLatest { uid ->
+                        if (uid == null) flowOf(null)
+                        else sessionRepository.getActiveSessionStream(uid)
+                    }
+                    .collect { session ->
+                        handleSessionUpdate(session)
+                    }
             }
         }
     }
 
     private suspend fun handleSessionUpdate(session: Session?) {
+        if (session == null) {
+            lotObserverJob?.cancel()
+            lotObserverJob = null
+            observedLotId = null
+            _uiState.update {
+                it.copy(
+                    session = null,
+                    lot = null,
+                    feeResult = null,
+                    elapsedSeconds = 0L,
+                    plannedRemainingMinutes = null,
+                    isExitRequestActive = false,
+                    exitRequestRemainingSeconds = 0L,
+                    isWaitingAtExitGate = false
+                )
+            }
+            return
+        }
+
         val serverNow = timeOffsetProvider.serverNow()
         val exitRemSec = computeExitRemainingSeconds(session, serverNow)
         val waitingAtExit = computeIsWaitingAtExitGate(session, serverNow)
@@ -80,13 +114,17 @@ class SessionViewModel @Inject constructor(
                 isWaitingAtExitGate = waitingAtExit
             )
         }
-        if (session != null) {
-            viewModelScope.launch {
+        if (session.lotId != observedLotId) {
+            observedLotId = session.lotId
+            lotObserverJob?.cancel()
+            lotObserverJob = viewModelScope.launch {
                 lotRepository.getLotStream(session.lotId).collect { lot ->
                     _uiState.update { it.copy(lot = lot) }
                     updateFee()
                 }
             }
+        } else {
+            updateFee()
         }
     }
 
